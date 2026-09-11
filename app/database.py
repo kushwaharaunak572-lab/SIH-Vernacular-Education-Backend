@@ -1,26 +1,48 @@
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from urllib.parse import quote_plus
 
 
-DB_USER = "postgres"
-DB_PASSWORD = "81154"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "vernacular_education"
+# Load .env file
+load_dotenv()
 
 
-DATABASE_URL = (
-    f"postgresql://{DB_USER}:{quote_plus(DB_PASSWORD)}"
-    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
+# ==========================================
+# DATABASE CONFIGURATION
+# ==========================================
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL is not set. Please check your .env file."
+    )
+
+
+# Render compatibility
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgres://",
+        "postgresql://",
+        1
+    )
+
+
+# ==========================================
+# DATABASE ENGINE
+# ==========================================
 
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True
 )
 
+
+# ==========================================
+# DATABASE SESSION
+# ==========================================
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -29,13 +51,22 @@ SessionLocal = sessionmaker(
 )
 
 
+# ==========================================
+# BASE MODEL
+# ==========================================
+
 Base = declarative_base()
 
+
+# ==========================================
+# DATABASE DEPENDENCY
+# ==========================================
 
 def get_db():
     db = SessionLocal()
 
     try:
         yield db
+
     finally:
         db.close()

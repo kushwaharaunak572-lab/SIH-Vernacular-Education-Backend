@@ -1,14 +1,25 @@
+import os
 from datetime import datetime, timedelta, timezone
 
+from dotenv import load_dotenv
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+
+
+# Load .env file
+load_dotenv()
 
 
 # ==========================================
 # SETTINGS
 # ==========================================
 
-SECRET_KEY = "SIH_VERNACULAR_EDUCATION_SECRET_KEY_2026"
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY is not set. Please check your .env file."
+    )
 
 ALGORITHM = "HS256"
 
