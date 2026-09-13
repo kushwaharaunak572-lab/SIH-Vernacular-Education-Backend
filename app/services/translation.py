@@ -1,4 +1,4 @@
-from deep_translator import MyMemoryTranslator
+from deep_translator import MyMemoryTranslator, GoogleTranslator
 
 
 # ============================================================
@@ -20,6 +20,28 @@ SUPPORTED_LANGUAGES = {
     "Assamese": "as-IN",
     "Nepali": "ne-NP",
     "Urdu": "ur-PK",
+}
+
+
+# ============================================================
+# GOOGLE TRANSLATOR LANGUAGE CODES
+# ============================================================
+
+GOOGLE_LANGUAGE_CODES = {
+    "English": "en",
+    "Hindi": "hi",
+    "Bengali": "bn",
+    "Gujarati": "gu",
+    "Marathi": "mr",
+    "Punjabi": "pa",
+    "Tamil": "ta",
+    "Telugu": "te",
+    "Kannada": "kn",
+    "Malayalam": "ml",
+    "Odia": "or",
+    "Assamese": "as",
+    "Nepali": "ne",
+    "Urdu": "ur",
 }
 
 
@@ -132,7 +154,73 @@ def normalize_language(language: str) -> str:
 
 
 # ============================================================
-# TRANSLATE TEXT
+# TRANSLATE USING MYMEMORY
+# ============================================================
+
+def translate_with_mymemory(
+    text: str,
+    source_language: str,
+    target_language: str
+) -> str:
+
+    source_code = SUPPORTED_LANGUAGES[
+        source_language
+    ]
+
+    target_code = SUPPORTED_LANGUAGES[
+        target_language
+    ]
+
+    translator = MyMemoryTranslator(
+        source=source_code,
+        target=target_code
+    )
+
+    translated_text = translator.translate(text)
+
+    if not translated_text:
+        raise ValueError(
+            "MyMemory returned an empty result"
+        )
+
+    return translated_text
+
+
+# ============================================================
+# TRANSLATE USING GOOGLE
+# ============================================================
+
+def translate_with_google(
+    text: str,
+    source_language: str,
+    target_language: str
+) -> str:
+
+    source_code = GOOGLE_LANGUAGE_CODES[
+        source_language
+    ]
+
+    target_code = GOOGLE_LANGUAGE_CODES[
+        target_language
+    ]
+
+    translator = GoogleTranslator(
+        source=source_code,
+        target=target_code
+    )
+
+    translated_text = translator.translate(text)
+
+    if not translated_text:
+        raise ValueError(
+            "Google Translator returned an empty result"
+        )
+
+    return translated_text
+
+
+# ============================================================
+# MAIN TRANSLATION FUNCTION
 # ============================================================
 
 def translate_text(
@@ -141,13 +229,19 @@ def translate_text(
     target_language: str
 ) -> str:
 
+    # --------------------------------------------------------
     # Empty text check
+    # --------------------------------------------------------
+
     if not text or not text.strip():
         raise ValueError(
             "Text cannot be empty"
         )
 
+    # --------------------------------------------------------
     # Normalize languages
+    # --------------------------------------------------------
+
     source_language_name = normalize_language(
         source_language
     )
@@ -156,39 +250,58 @@ def translate_text(
         target_language
     )
 
+    # --------------------------------------------------------
     # Same language
+    # --------------------------------------------------------
+
     if source_language_name == target_language_name:
         return text
 
-    # Get MyMemory language codes
-    source_code = SUPPORTED_LANGUAGES[
-        source_language_name
-    ]
-
-    target_code = SUPPORTED_LANGUAGES[
-        target_language_name
-    ]
+    # --------------------------------------------------------
+    # First try MyMemory
+    # --------------------------------------------------------
 
     try:
 
-        translator = MyMemoryTranslator(
-            source=source_code,
-            target=target_code
+        return translate_with_mymemory(
+            text=text,
+            source_language=source_language_name,
+            target_language=target_language_name
         )
 
-        translated_text = translator.translate(
-            text
+    except Exception as mymemory_error:
+
+        print(
+            "MyMemory translation failed."
         )
 
-        if not translated_text:
-            raise ValueError(
-                "Translation returned an empty result"
-            )
+        print(
+            f"Reason: {mymemory_error}"
+        )
 
-        return translated_text
+    # --------------------------------------------------------
+    # If MyMemory fails, use Google Translator
+    # --------------------------------------------------------
 
-    except Exception as e:
+    try:
+
+        return translate_with_google(
+            text=text,
+            source_language=source_language_name,
+            target_language=target_language_name
+        )
+
+    except Exception as google_error:
+
+        print(
+            "Google translation also failed."
+        )
+
+        print(
+            f"Reason: {google_error}"
+        )
 
         raise ValueError(
-            f"Translation service error: {source_language} -> {target_language}: {str(e)}"
+            "Translation service is temporarily unavailable. "
+            "Please try again later."
         )
