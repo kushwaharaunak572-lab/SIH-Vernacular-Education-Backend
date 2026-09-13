@@ -1,7 +1,10 @@
 from deep_translator import MyMemoryTranslator
 
 
-# Language name -> MyMemory language code
+# ============================================================
+# SUPPORTED LANGUAGES
+# ============================================================
+
 SUPPORTED_LANGUAGES = {
     "English": "en-GB",
     "Hindi": "hi-IN",
@@ -20,6 +23,118 @@ SUPPORTED_LANGUAGES = {
 }
 
 
+# ============================================================
+# LANGUAGE ALIASES
+# ============================================================
+
+LANGUAGE_ALIASES = {
+
+    # English
+    "english": "English",
+    "en": "English",
+    "en-in": "English",
+    "en-gb": "English",
+
+    # Hindi
+    "hindi": "Hindi",
+    "hi": "Hindi",
+    "hi-in": "Hindi",
+
+    # Bengali
+    "bengali": "Bengali",
+    "bn": "Bengali",
+    "bn-in": "Bengali",
+
+    # Gujarati
+    "gujarati": "Gujarati",
+    "gu": "Gujarati",
+    "gu-in": "Gujarati",
+
+    # Marathi
+    "marathi": "Marathi",
+    "mr": "Marathi",
+    "mr-in": "Marathi",
+
+    # Punjabi
+    "punjabi": "Punjabi",
+    "pa": "Punjabi",
+    "pa-in": "Punjabi",
+
+    # Tamil
+    "tamil": "Tamil",
+    "ta": "Tamil",
+    "ta-in": "Tamil",
+
+    # Telugu
+    "telugu": "Telugu",
+    "te": "Telugu",
+    "te-in": "Telugu",
+
+    # Kannada
+    "kannada": "Kannada",
+    "kn": "Kannada",
+    "kn-in": "Kannada",
+
+    # Malayalam
+    "malayalam": "Malayalam",
+    "ml": "Malayalam",
+    "ml-in": "Malayalam",
+
+    # Odia
+    "odia": "Odia",
+    "or": "Odia",
+    "or-in": "Odia",
+
+    # Assamese
+    "assamese": "Assamese",
+    "as": "Assamese",
+    "as-in": "Assamese",
+
+    # Nepali
+    "nepali": "Nepali",
+    "ne": "Nepali",
+    "ne-np": "Nepali",
+
+    # Urdu
+    "urdu": "Urdu",
+    "ur": "Urdu",
+    "ur-in": "Urdu",
+    "ur-pk": "Urdu",
+}
+
+
+# ============================================================
+# NORMALIZE LANGUAGE
+# ============================================================
+
+def normalize_language(language: str) -> str:
+
+    if not language:
+        raise ValueError(
+            "Language cannot be empty"
+        )
+
+    language_key = language.strip().lower()
+
+    # Direct language name
+    for language_name in SUPPORTED_LANGUAGES:
+
+        if language_key == language_name.lower():
+            return language_name
+
+    # Language code / alias
+    if language_key in LANGUAGE_ALIASES:
+        return LANGUAGE_ALIASES[language_key]
+
+    raise ValueError(
+        f"Unsupported language: {language}"
+    )
+
+
+# ============================================================
+# TRANSLATE TEXT
+# ============================================================
+
 def translate_text(
     text: str,
     source_language: str,
@@ -28,41 +143,52 @@ def translate_text(
 
     # Empty text check
     if not text or not text.strip():
-        raise ValueError("Text cannot be empty")
-
-    # Source language check
-    if source_language not in SUPPORTED_LANGUAGES:
         raise ValueError(
-            f"Unsupported source language: {source_language}"
+            "Text cannot be empty"
         )
 
-    # Target language check
-    if target_language not in SUPPORTED_LANGUAGES:
-        raise ValueError(
-            f"Unsupported target language: {target_language}"
-        )
+    # Normalize languages
+    source_language_name = normalize_language(
+        source_language
+    )
+
+    target_language_name = normalize_language(
+        target_language
+    )
 
     # Same language
-    if source_language == target_language:
+    if source_language_name == target_language_name:
         return text
 
-    source_code = SUPPORTED_LANGUAGES[source_language]
-    target_code = SUPPORTED_LANGUAGES[target_language]
+    # Get MyMemory language codes
+    source_code = SUPPORTED_LANGUAGES[
+        source_language_name
+    ]
+
+    target_code = SUPPORTED_LANGUAGES[
+        target_language_name
+    ]
 
     try:
+
         translator = MyMemoryTranslator(
             source=source_code,
             target=target_code
         )
 
-        translated_text = translator.translate(text)
+        translated_text = translator.translate(
+            text
+        )
 
         if not translated_text:
-            raise ValueError("Translation returned an empty result")
+            raise ValueError(
+                "Translation returned an empty result"
+            )
 
         return translated_text
 
     except Exception as e:
+
         raise ValueError(
-            f"Translation service error: {text} --> {str(e)}"
+            f"Translation service error: {source_language} -> {target_language}: {str(e)}"
         )
