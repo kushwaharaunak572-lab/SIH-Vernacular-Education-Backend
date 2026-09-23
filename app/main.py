@@ -1,22 +1,40 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
+from uuid import uuid4
+from io import BytesIO
+from app import schemas
 from app.database import engine, Base, get_db
 from app import models
-from fastapi.security import OAuth2PasswordRequestForm
-from app.schemas import (ProgressCreate,
-    ProgressResponse,)
+
 from app.schemas import (
     UserCreate,
     UserLogin,
     UserResponse,
+
     SubjectCreate,
     SubjectResponse,
+
     LessonCreate,
     LessonResponse,
+
     ProgressCreate,
     ProgressResponse,
+
     TranslationRequest,
     TranslationResponse,
+
+    QuizQuestionCreate,
+    QuizQuestionResponse,
+
+    QuizAnswerCreate,
+    QuizAnswerResponse,
+
+    QuizAttemptCreate,
+    QuizAttemptResponse,
+
+    QuizSubmission,
 )
 
 from app.auth import (
@@ -31,6 +49,10 @@ from app.services.translation import (
     translate_text,
     SUPPORTED_LANGUAGES
 )
+
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib import colors
+from reportlab.pdfgen import canvas
 
 
 # ============================================================
@@ -177,8 +199,7 @@ def login_user(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    # OAuth2 uses "username" field.
-    # We are using email as username.
+
     db_user = (
         db.query(models.User)
         .filter(models.User.email == form_data.username)
@@ -458,13 +479,22 @@ def translate(
             status_code=500,
             detail=f"Unexpected translation error: {str(e)}"
         )
-        
-@app.post("/progress", response_model=ProgressResponse)
+
+
+# ============================================================
+# CREATE / UPDATE PROGRESS
+# ============================================================
+
+@app.post(
+    "/progress",
+    response_model=ProgressResponse
+)
 def create_progress(
     progress: ProgressCreate,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+
     existing_progress = (
         db.query(models.Progress)
         .filter(
@@ -475,8 +505,14 @@ def create_progress(
     )
 
     if existing_progress:
-        existing_progress.progress_percentage = progress.progress_percentage
-        existing_progress.is_completed = progress.is_completed
+
+        existing_progress.progress_percentage = (
+            progress.progress_percentage
+        )
+
+        existing_progress.is_completed = (
+            progress.is_completed
+        )
 
         db.commit()
         db.refresh(existing_progress)
@@ -496,6 +532,7 @@ def create_progress(
 
     return new_progress
 
+
 # ============================================================
 # GET MY PROGRESS
 # ============================================================
@@ -508,6 +545,7 @@ def get_my_progress(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+
     progress = (
         db.query(models.Progress)
         .filter(
@@ -532,6 +570,7 @@ def get_lesson_progress(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+
     progress = (
         db.query(models.Progress)
         .filter(
@@ -542,9 +581,736 @@ def get_lesson_progress(
     )
 
     if not progress:
+
         raise HTTPException(
             status_code=404,
             detail="Progress not found"
         )
 
     return progress
+
+
+# ============================================================
+# QUIZ - CREATE QUESTION
+# ============================================================
+
+@app.post(
+    "/quiz/questions",
+    response_model=QuizQuestionResponse
+)
+def create_quiz_question(
+    question: QuizQuestionCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+
+    if current_user.role not in ["teacher", "admin"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Only teachers or admins can create quiz questions"
+        )
+
+    lesson = (
+        db.query(models.Lesson)
+        .filter(models.Lesson.id == question.lesson_id)
+        .first()
+    )
+
+    if not lesson:
+        raise HTTPException(
+            status_code=404,
+            detail="Lesson not found"
+        )
+
+    correct_answer = question.correct_answer.upper()
+
+    if correct_answer not in ["A", "B", "C", "D"]:
+        raise HTTPException(
+            status_code=400,
+            detail="correct_answer must be A, B, C or D"
+        )
+
+    new_question = models.QuizQuestion(
+        lesson_id=question.lesson_id,
+        question=question.question,
+        option_a=question.option_a,
+        option_b=question.option_b,
+        option_c=question.option_c,
+        option_d=question.option_d,
+        correct_answer=correct_answer,
+        explanation=question.explanation
+    )
+
+    db.add(new_question)
+    db.commit()
+    db.refresh(new_question)
+
+    return new_question
+
+
+# ============================================================
+# QUIZ - GET QUESTIONS FOR LESSON
+# ============================================================
+
+@app.get(
+    "/quiz/lesson/{lesson_id}",
+    response_model=list[QuizQuestionResponse]
+)
+def get_quiz_questions(
+    lesson_id: int,
+    db: Session = Depends(get_db)
+):
+
+    lesson = (
+        db.query(models.Lesson)
+        .filter(models.Lesson.id == lesson_id)
+        .first()
+    )
+
+    if not lesson:
+        raise HTTPException(
+            status_code=404,
+            detail="Lesson not found"
+        )
+
+    questions = (
+        db.query(models.QuizQuestion)
+        .filter(
+            models.QuizQuestion.lesson_id == lesson_id,
+            models.QuizQuestion.is_active == True
+        )
+        .all()
+    )
+
+    return questions
+
+
+# ============================================================
+# QUIZ - START ATTEMPT
+# ============================================================
+
+@app.post(
+    "/quiz/attempt",
+    response_model=QuizAttemptResponse
+)
+def start_quiz_attempt(
+    attempt: QuizAttemptCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+
+    lesson = (
+        db.query(models.Lesson)
+        .filter(models.Lesson.id == attempt.lesson_id)
+        .first()
+    )
+
+    if not lesson:
+        raise HTTPException(
+            status_code=404,
+            detail="Lesson not found"
+        )
+
+    total_questions = (
+        db.query(models.QuizQuestion)
+        .filter(
+            models.QuizQuestion.lesson_id == attempt.lesson_id,
+            models.QuizQuestion.is_active == True
+        )
+        .count()
+    )
+
+    if total_questions == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="No quiz questions found for this lesson"
+        )
+
+    new_attempt = models.QuizAttempt(
+        user_id=current_user.id,
+        lesson_id=attempt.lesson_id,
+        total_questions=total_questions,
+        correct_answers=0,
+        score=0,
+        completed=False
+    )
+
+    db.add(new_attempt)
+    db.commit()
+    db.refresh(new_attempt)
+
+    return new_attempt
+
+
+# ============================================================
+# QUIZ - SUBMIT QUIZ + UPDATE PROGRESS
+# ============================================================
+
+@app.post(
+    "/quiz/submit",
+    response_model=QuizAttemptResponse
+)
+def submit_quiz(
+    submission: QuizSubmission,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+
+    questions = (
+        db.query(models.QuizQuestion)
+        .filter(
+            models.QuizQuestion.lesson_id == submission.lesson_id,
+            models.QuizQuestion.is_active == True
+        )
+        .all()
+    )
+
+    if not questions:
+        raise HTTPException(
+            status_code=404,
+            detail="No quiz questions found for this lesson"
+        )
+
+    question_map = {
+        question.id: question
+        for question in questions
+    }
+
+    total_questions = len(questions)
+
+    # Find latest unfinished attempt
+    attempt = (
+        db.query(models.QuizAttempt)
+        .filter(
+            models.QuizAttempt.user_id == current_user.id,
+            models.QuizAttempt.lesson_id == submission.lesson_id,
+            models.QuizAttempt.completed == False
+        )
+        .order_by(models.QuizAttempt.id.desc())
+        .first()
+    )
+
+    if not attempt:
+
+        attempt = models.QuizAttempt(
+            user_id=current_user.id,
+            lesson_id=submission.lesson_id,
+            total_questions=total_questions,
+            correct_answers=0,
+            score=0,
+            completed=False
+        )
+
+        db.add(attempt)
+        db.flush()
+
+    correct_count = 0
+
+    submitted_question_ids = set()
+
+    for answer in submission.answers:
+
+        if answer.question_id in submitted_question_ids:
+            continue
+
+        submitted_question_ids.add(answer.question_id)
+
+        question = question_map.get(answer.question_id)
+
+        if not question:
+            continue
+
+        selected_answer = answer.selected_answer.upper()
+
+        if selected_answer not in ["A", "B", "C", "D"]:
+            continue
+
+        is_correct = (
+            selected_answer == question.correct_answer.upper()
+        )
+
+        if is_correct:
+            correct_count += 1
+
+        quiz_answer = models.QuizAnswer(
+            attempt_id=attempt.id,
+            question_id=question.id,
+            selected_answer=selected_answer,
+            is_correct=is_correct
+        )
+
+        db.add(quiz_answer)
+
+    # ========================================================
+    # CALCULATE SCORE
+    # ========================================================
+
+    score = round(
+        (correct_count / total_questions) * 100
+    )
+
+    attempt.total_questions = total_questions
+    attempt.correct_answers = correct_count
+    attempt.score = score
+    attempt.completed = True
+
+    # ========================================================
+    # QUIZ + PROGRESS INTEGRATION
+    # ========================================================
+
+    existing_progress = (
+        db.query(models.Progress)
+        .filter(
+            models.Progress.user_id == current_user.id,
+            models.Progress.lesson_id == submission.lesson_id
+        )
+        .first()
+    )
+
+    if score >= 50:
+
+        progress_percentage = 100
+        is_completed = True
+
+    else:
+
+        progress_percentage = 50
+        is_completed = False
+
+    if existing_progress:
+
+        existing_progress.progress_percentage = progress_percentage
+        existing_progress.is_completed = is_completed
+
+    else:
+
+        new_progress = models.Progress(
+            user_id=current_user.id,
+            lesson_id=submission.lesson_id,
+            progress_percentage=progress_percentage,
+            is_completed=is_completed
+        )
+
+        db.add(new_progress)
+
+    # ========================================================
+    # ACHIEVEMENT INTEGRATION
+    # ========================================================
+
+    # Unlock achievement when the student completes the quiz
+    # with a score of 50% or more.
+    if score >= 50:
+        existing_achievement = (
+            db.query(models.Achievement)
+            .filter(
+                models.Achievement.user_id == current_user.id,
+                models.Achievement.lesson_id == submission.lesson_id,
+                models.Achievement.achievement_type == "lesson_completion"
+            )
+            .first()
+        )
+
+        if not existing_achievement:
+            lesson = (
+                db.query(models.Lesson)
+                .filter(models.Lesson.id == submission.lesson_id)
+                .first()
+            )
+
+            lesson_title = (
+                lesson.title
+                if lesson
+                else f"Lesson {submission.lesson_id}"
+            )
+
+            new_achievement = models.Achievement(
+                user_id=current_user.id,
+                lesson_id=submission.lesson_id,
+                achievement_type="lesson_completion",
+                title="Lesson Completed",
+                description=f"Completed quiz for {lesson_title}"
+            )
+
+            db.add(new_achievement)
+
+    # ========================================================
+    # CERTIFICATE INTEGRATION
+    # ========================================================
+
+    # Generate one certificate when the student completes the quiz
+    # with a score of 50% or more.
+    if score >= 50:
+        existing_certificate = (
+            db.query(models.Certificate)
+            .filter(
+                models.Certificate.user_id == current_user.id,
+                models.Certificate.lesson_id == submission.lesson_id
+            )
+            .first()
+        )
+
+        if not existing_certificate:
+            lesson = (
+                db.query(models.Lesson)
+                .filter(models.Lesson.id == submission.lesson_id)
+                .first()
+            )
+
+            lesson_title = (
+                lesson.title
+                if lesson
+                else f"Lesson {submission.lesson_id}"
+            )
+
+            certificate_number = f"CERT-{uuid4().hex[:12].upper()}"
+
+            new_certificate = models.Certificate(
+                certificate_id=certificate_number,
+                user_id=current_user.id,
+                lesson_id=submission.lesson_id,
+                title="Certificate of Lesson Completion",
+                description=(
+                    f"{current_user.name} successfully completed "
+                    f"the quiz for {lesson_title} with a score of {score}%."
+                ),
+                score=score
+            )
+
+            db.add(new_certificate)
+
+    # ========================================================
+    # SAVE EVERYTHING
+    # ========================================================
+
+    db.commit()
+    db.refresh(attempt)
+
+    return attempt
+
+
+# ============================================================
+# QUIZ - GET MY ATTEMPTS
+# ============================================================
+
+@app.get(
+    "/quiz/attempts/me",
+    response_model=list[QuizAttemptResponse]
+)
+def get_my_quiz_attempts(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+
+    attempts = (
+        db.query(models.QuizAttempt)
+        .filter(
+            models.QuizAttempt.user_id == current_user.id
+        )
+        .order_by(models.QuizAttempt.id.desc())
+        .all()
+    )
+
+    return attempts
+
+
+# ============================================================
+# QUIZ - GET PARTICULAR ATTEMPT
+# ============================================================
+
+@app.get(
+    "/quiz/attempt/{attempt_id}",
+    response_model=QuizAttemptResponse
+)
+def get_quiz_attempt(
+    attempt_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+
+    attempt = (
+        db.query(models.QuizAttempt)
+        .filter(
+            models.QuizAttempt.id == attempt_id,
+            models.QuizAttempt.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not attempt:
+        raise HTTPException(
+            status_code=404,
+            detail="Quiz attempt not found"
+        )
+
+    return attempt
+
+# ============================================================
+# ACHIEVEMENT ENDPOINT
+# ============================================================
+
+@app.get(
+    "/achievements/me",
+    response_model=list[schemas.AchievementResponse]
+)
+def get_my_achievements(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    achievements = (
+        db.query(models.Achievement)
+        .filter(
+            models.Achievement.user_id == current_user.id
+        )
+        .order_by(
+            models.Achievement.unlocked_at.desc()
+        )
+        .all()
+    )
+
+    return achievements
+
+# ============================================================
+# CERTIFICATE ENDPOINT
+# ============================================================
+
+@app.get(
+    "/certificates/me",
+    response_model=list[schemas.CertificateResponse]
+)
+def get_my_certificates(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    certificates = (
+        db.query(models.Certificate)
+        .filter(
+            models.Certificate.user_id == current_user.id
+        )
+        .order_by(
+            models.Certificate.issued_at.desc()
+        )
+        .all()
+    )
+
+    return certificates
+
+# ============================================================
+# CERTIFICATE PDF DOWNLOAD
+# ============================================================
+
+@app.get("/certificates/{certificate_id}/download")
+def download_certificate(
+    certificate_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    certificate = (
+        db.query(models.Certificate)
+        .filter(
+            models.Certificate.certificate_id == certificate_id,
+            models.Certificate.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not certificate:
+        raise HTTPException(
+            status_code=404,
+            detail="Certificate not found"
+        )
+
+    lesson = (
+        db.query(models.Lesson)
+        .filter(models.Lesson.id == certificate.lesson_id)
+        .first()
+    )
+
+    lesson_title = (
+        lesson.title
+        if lesson
+        else f"Lesson {certificate.lesson_id}"
+    )
+
+    # Create PDF in memory
+    pdf_buffer = BytesIO()
+
+    page_width, page_height = landscape(A4)
+
+    pdf = canvas.Canvas(
+        pdf_buffer,
+        pagesize=(page_width, page_height)
+    )
+
+    # --------------------------------------------------------
+    # PAGE BACKGROUND
+    # --------------------------------------------------------
+
+    pdf.setFillColor(colors.HexColor("#F8FAFC"))
+    pdf.rect(
+        0,
+        0,
+        page_width,
+        page_height,
+        fill=1,
+        stroke=0
+    )
+
+    # Outer border
+    pdf.setStrokeColor(colors.HexColor("#1E3A8A"))
+    pdf.setLineWidth(5)
+    pdf.rect(
+        25,
+        25,
+        page_width - 50,
+        page_height - 50,
+        fill=0,
+        stroke=1
+    )
+
+    # Inner border
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setLineWidth(2)
+    pdf.rect(
+        38,
+        38,
+        page_width - 76,
+        page_height - 76,
+        fill=0,
+        stroke=1
+    )
+
+    # --------------------------------------------------------
+    # HEADER
+    # --------------------------------------------------------
+
+    pdf.setFillColor(colors.HexColor("#1E3A8A"))
+    pdf.setFont("Helvetica-Bold", 28)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 90,
+        "CERTIFICATE OF COMPLETION"
+    )
+
+    pdf.setFillColor(colors.HexColor("#C9A227"))
+    pdf.setFont("Helvetica-Bold", 15)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 118,
+        "VERNACULAR EDUCATION"
+    )
+
+    # Decorative line
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setLineWidth(2)
+    pdf.line(
+        page_width / 2 - 170,
+        page_height - 132,
+        page_width / 2 + 170,
+        page_height - 132
+    )
+
+    # --------------------------------------------------------
+    # BODY
+    # --------------------------------------------------------
+
+    pdf.setFillColor(colors.HexColor("#334155"))
+    pdf.setFont("Helvetica", 14)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 175,
+        "This certificate is proudly presented to"
+    )
+
+    pdf.setFillColor(colors.HexColor("#111827"))
+    pdf.setFont("Helvetica-Bold", 30)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 220,
+        current_user.name
+    )
+
+    pdf.setFillColor(colors.HexColor("#334155"))
+    pdf.setFont("Helvetica", 14)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 255,
+        "for successfully completing the lesson"
+    )
+
+    pdf.setFillColor(colors.HexColor("#1E3A8A"))
+    pdf.setFont("Helvetica-Bold", 22)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 292,
+        lesson_title
+    )
+
+    # Score
+    pdf.setFillColor(colors.HexColor("#166534"))
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawCentredString(
+        page_width / 2,
+        page_height - 335,
+        f"Quiz Score: {certificate.score}%"
+    )
+
+    # --------------------------------------------------------
+    # CERTIFICATE DETAILS
+    # --------------------------------------------------------
+
+    details_y = 125
+
+    pdf.setFillColor(colors.HexColor("#475569"))
+    pdf.setFont("Helvetica", 11)
+
+    pdf.drawString(
+        75,
+        details_y,
+        f"Certificate ID: {certificate.certificate_id}"
+    )
+
+    issued_date = certificate.issued_at.strftime("%d %B %Y")
+
+    pdf.drawRightString(
+        page_width - 75,
+        details_y,
+        f"Issued on: {issued_date}"
+    )
+
+    # --------------------------------------------------------
+    # FOOTER
+    # --------------------------------------------------------
+
+    pdf.setFillColor(colors.HexColor("#1E3A8A"))
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawCentredString(
+        page_width / 2,
+        82,
+        "AI-Powered Vernacular Education Platform"
+    )
+
+    pdf.setFillColor(colors.HexColor("#64748B"))
+    pdf.setFont("Helvetica", 9)
+    pdf.drawCentredString(
+        page_width / 2,
+        62,
+        "SIH26042 • Mother Tongue-Based Primary Education"
+    )
+
+    pdf.showPage()
+    pdf.save()
+
+    pdf_buffer.seek(0)
+
+    safe_certificate_id = certificate.certificate_id.replace("/", "_")
+
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="certificate_{safe_certificate_id}.pdf"'
+            )
+        }
+    )
+

@@ -9,3 +9,4 @@ python-multipart
 deep-translator
 python-dotenv
 email-validator
+reportlab

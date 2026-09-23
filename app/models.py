@@ -15,19 +15,14 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 
 
-# =========================================================
+# ============================================================
 # USER MODEL
-# =========================================================
+# ============================================================
 
 class User(Base):
-
     __tablename__ = "users"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    id = Column(Integer, primary_key=True, index=True)
 
     name = Column(
         String(100),
@@ -63,19 +58,34 @@ class User(Base):
         default=True
     )
 
-    # Relationship with lessons created by this user
     lessons = relationship(
         "Lesson",
         back_populates="creator"
     )
 
+    quiz_attempts = relationship(
+        "QuizAttempt",
+        back_populates="user"
+    )
 
-# =========================================================
+    achievements = relationship(
+        "Achievement",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    certificates = relationship(
+        "Certificate",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+
+# ============================================================
 # SUBJECT MODEL
-# =========================================================
+# ============================================================
 
 class Subject(Base):
-
     __tablename__ = "subjects"
 
     id = Column(
@@ -105,7 +115,6 @@ class Subject(Base):
         default=True
     )
 
-    # Relationship with lessons
     lessons = relationship(
         "Lesson",
         back_populates="subject",
@@ -113,12 +122,11 @@ class Subject(Base):
     )
 
 
-# =========================================================
+# ============================================================
 # LESSON MODEL
-# =========================================================
+# ============================================================
 
 class Lesson(Base):
-
     __tablename__ = "lessons"
 
     id = Column(
@@ -165,27 +173,35 @@ class Lesson(Base):
         default=True
     )
 
-    # Relationship with Subject
     subject = relationship(
         "Subject",
         back_populates="lessons"
     )
 
-    # Relationship with User
     creator = relationship(
         "User",
         back_populates="lessons"
     )
 
+    quiz_questions = relationship(
+        "QuizQuestion",
+        back_populates="lesson",
+        cascade="all, delete-orphan"
+    )
 
-# =========================================================
+
+# ============================================================
 # PROGRESS MODEL
-# =========================================================
+# ============================================================
 
 class Progress(Base):
     __tablename__ = "progress"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
     user_id = Column(
         Integer,
@@ -220,4 +236,309 @@ class Progress(Base):
         DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow
+    )
+
+
+# ============================================================
+# QUIZ QUESTION MODEL
+# ============================================================
+
+class QuizQuestion(Base):
+    __tablename__ = "quiz_questions"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    lesson_id = Column(
+        Integer,
+        ForeignKey("lessons.id"),
+        nullable=False
+    )
+
+    question = Column(
+        Text,
+        nullable=False
+    )
+
+    option_a = Column(
+        Text,
+        nullable=False
+    )
+
+    option_b = Column(
+        Text,
+        nullable=False
+    )
+
+    option_c = Column(
+        Text,
+        nullable=False
+    )
+
+    option_d = Column(
+        Text,
+        nullable=False
+    )
+
+    correct_answer = Column(
+        String(1),
+        nullable=False
+    )
+
+    explanation = Column(
+        Text,
+        nullable=True
+    )
+
+    is_active = Column(
+        Boolean,
+        default=True,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    lesson = relationship(
+        "Lesson",
+        back_populates="quiz_questions"
+    )
+
+    answers = relationship(
+        "QuizAnswer",
+        back_populates="question"
+    )
+
+
+# ============================================================
+# QUIZ ATTEMPT MODEL
+# ============================================================
+
+class QuizAttempt(Base):
+    __tablename__ = "quiz_attempts"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
+    )
+
+    lesson_id = Column(
+        Integer,
+        ForeignKey("lessons.id"),
+        nullable=False
+    )
+
+    total_questions = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    correct_answers = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    score = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    completed = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    user = relationship(
+        "User",
+        back_populates="quiz_attempts"
+    )
+
+    answers = relationship(
+        "QuizAnswer",
+        back_populates="attempt",
+        cascade="all, delete-orphan"
+    )
+
+
+# ============================================================
+# QUIZ ANSWER MODEL
+# ============================================================
+
+class QuizAnswer(Base):
+    __tablename__ = "quiz_answers"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    attempt_id = Column(
+        Integer,
+        ForeignKey("quiz_attempts.id"),
+        nullable=False
+    )
+
+    question_id = Column(
+        Integer,
+        ForeignKey("quiz_questions.id"),
+        nullable=False
+    )
+
+    selected_answer = Column(
+        String(1),
+        nullable=False
+    )
+
+    is_correct = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    attempt = relationship(
+        "QuizAttempt",
+        back_populates="answers"
+    )
+
+    question = relationship(
+        "QuizQuestion",
+        back_populates="answers"
+    )
+
+
+# ============================================================
+# ACHIEVEMENT MODEL
+# ============================================================
+
+class Achievement(Base):
+    __tablename__ = "achievements"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
+    )
+
+    lesson_id = Column(
+        Integer,
+        ForeignKey("lessons.id"),
+        nullable=True
+    )
+
+    achievement_type = Column(
+        String(50),
+        default="lesson_completion",
+        nullable=False
+    )
+
+    title = Column(
+        String(200),
+        nullable=False
+    )
+
+    description = Column(
+        Text,
+        nullable=True
+    )
+
+    unlocked_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    user = relationship(
+        "User",
+        back_populates="achievements"
+    )
+
+
+# ============================================================
+# CERTIFICATE MODEL
+# ============================================================
+
+class Certificate(Base):
+    __tablename__ = "certificates"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    certificate_id = Column(
+        String(100),
+        unique=True,
+        index=True,
+        nullable=False
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
+    )
+
+    lesson_id = Column(
+        Integer,
+        ForeignKey("lessons.id"),
+        nullable=False
+    )
+
+    title = Column(
+        String(200),
+        nullable=False
+    )
+
+    description = Column(
+        Text,
+        nullable=True
+    )
+
+    score = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    issued_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    user = relationship(
+        "User",
+        back_populates="certificates"
     )
