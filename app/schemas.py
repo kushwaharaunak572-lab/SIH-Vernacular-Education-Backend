@@ -222,3 +222,19 @@ class CertificateResponse(BaseModel):
     issued_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
+    
+class DashboardResponse(BaseModel):
+    user_id: int
+    name: str
+    email: EmailStr
+    language: str
+
+    total_lessons: int
+    completed_lessons: int
+    overall_progress: int
+
+    total_quiz_attempts: int
+    average_quiz_score: int
+
+    total_achievements: int
+    total_certificates: int
