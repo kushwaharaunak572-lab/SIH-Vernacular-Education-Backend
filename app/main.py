@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from uuid import uuid4
 from io import BytesIO
+import random
 from app import schemas
 from app.database import engine, Base, get_db
 from app import models
@@ -70,6 +72,16 @@ app = FastAPI(
     title="AI-Powered Vernacular Education API",
     description="Backend for SIH26042",
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -658,7 +670,9 @@ def create_quiz_question(
 )
 def get_quiz_questions(
     lesson_id: int,
-    db: Session = Depends(get_db)
+    limit: int = 5,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
 
     lesson = (
@@ -673,6 +687,12 @@ def get_quiz_questions(
             detail="Lesson not found"
         )
 
+    if limit < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="limit must be at least 1"
+        )
+
     questions = (
         db.query(models.QuizQuestion)
         .filter(
@@ -682,7 +702,48 @@ def get_quiz_questions(
         .all()
     )
 
-    return questions
+    # Try not to repeat the questions used in the student's
+    # immediately previous completed attempt. This gives the learner
+    # a genuinely different quiz whenever the question bank is large
+    # enough. If the bank is too small, the endpoint gracefully falls
+    # back to the complete active question bank.
+    previous_attempt = (
+        db.query(models.QuizAttempt)
+        .filter(
+            models.QuizAttempt.user_id == current_user.id,
+            models.QuizAttempt.lesson_id == lesson_id,
+            models.QuizAttempt.completed == True
+        )
+        .order_by(models.QuizAttempt.id.desc())
+        .first()
+    )
+
+    previous_question_ids = set()
+
+    if previous_attempt:
+        previous_answers = (
+            db.query(models.QuizAnswer)
+            .filter(
+                models.QuizAnswer.attempt_id == previous_attempt.id
+            )
+            .all()
+        )
+        previous_question_ids = {
+            answer.question_id
+            for answer in previous_answers
+        }
+
+    fresh_questions = [
+        question
+        for question in questions
+        if question.id not in previous_question_ids
+    ]
+
+    if len(fresh_questions) >= limit:
+        questions = fresh_questions
+
+    random.shuffle(questions)
+    return questions[:limit]
 
 
 # ============================================================
@@ -711,7 +772,7 @@ def start_quiz_attempt(
             detail="Lesson not found"
         )
 
-    total_questions = (
+    question_bank_size = (
         db.query(models.QuizQuestion)
         .filter(
             models.QuizQuestion.lesson_id == attempt.lesson_id,
@@ -719,6 +780,16 @@ def start_quiz_attempt(
         )
         .count()
     )
+
+    if question_bank_size == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="No quiz questions found for this lesson"
+        )
+
+    # The frontend receives 5 random questions from /quiz/lesson/{lesson_id}.
+    # Keep the attempt size aligned with that quiz size.
+    total_questions = min(5, question_bank_size)
 
     if total_questions == 0:
         raise HTTPException(
@@ -776,8 +847,9 @@ def submit_quiz(
         for question in questions
     }
 
-    total_questions = len(questions)
-
+    # Score only the questions actually submitted by the frontend.
+    # This keeps scoring correct when the lesson has a larger question bank
+    # but each attempt contains only a random subset.
     # Find latest unfinished attempt
     attempt = (
         db.query(models.QuizAttempt)
@@ -845,11 +917,19 @@ def submit_quiz(
     # CALCULATE SCORE
     # ========================================================
 
+    submitted_count = len(submitted_question_ids)
+
+    if submitted_count == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="At least one quiz answer is required"
+        )
+
     score = round(
-        (correct_count / total_questions) * 100
+        (correct_count / submitted_count) * 100
     )
 
-    attempt.total_questions = total_questions
+    attempt.total_questions = submitted_count
     attempt.correct_answers = correct_count
     attempt.score = score
     attempt.completed = True
@@ -1314,3 +1394,87 @@ def download_certificate(
         }
     )
 
+@app.get("/dashboard", response_model=schemas.DashboardResponse)
+def get_dashboard(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    total_lessons = (
+        db.query(models.Lesson)
+        .filter(models.Lesson.is_active == True)
+        .count()
+    )
+
+    completed_lessons = (
+        db.query(models.Progress)
+        .filter(
+            models.Progress.user_id == current_user.id,
+            models.Progress.is_completed == True
+        )
+        .count()
+    )
+
+    if total_lessons > 0:
+        overall_progress = round(
+            (completed_lessons / total_lessons) * 100
+        )
+    else:
+        overall_progress = 0
+
+    total_quiz_attempts = (
+        db.query(models.QuizAttempt)
+        .filter(
+            models.QuizAttempt.user_id == current_user.id,
+            models.QuizAttempt.completed == True
+        )
+        .count()
+    )
+
+    quiz_attempts = (
+        db.query(models.QuizAttempt)
+        .filter(
+            models.QuizAttempt.user_id == current_user.id,
+            models.QuizAttempt.completed == True
+        )
+        .all()
+    )
+
+    if quiz_attempts:
+        average_quiz_score = round(
+            sum(
+                attempt.score
+                for attempt in quiz_attempts
+            ) / len(quiz_attempts)
+        )
+    else:
+        average_quiz_score = 0
+
+    total_achievements = (
+        db.query(models.Achievement)
+        .filter(
+            models.Achievement.user_id == current_user.id
+        )
+        .count()
+    )
+
+    total_certificates = (
+        db.query(models.Certificate)
+        .filter(
+            models.Certificate.user_id == current_user.id
+        )
+        .count()
+    )
+
+    return {
+        "user_id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "language": current_user.language,
+        "total_lessons": total_lessons,
+        "completed_lessons": completed_lessons,
+        "overall_progress": overall_progress,
+        "total_quiz_attempts": total_quiz_attempts,
+        "average_quiz_score": average_quiz_score,
+        "total_achievements": total_achievements,
+        "total_certificates": total_certificates
+    }
