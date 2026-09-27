@@ -171,7 +171,6 @@ QUESTIONS = {
         ("Which number is odd?", "24", "30", "17", "42", "C", "17 is not divisible by 2, so it is odd."),
         ("What is the place value of 5 in 352?", "5", "50", "500", "2", "B", "5 is in the tens place, so its place value is 50."),
     ],
-
     2: [
         ("What is 8 + 7?", "13", "14", "15", "16", "C", "8 plus 7 equals 15."),
         ("What is 20 - 6?", "12", "13", "14", "15", "C", "20 minus 6 equals 14."),
@@ -184,7 +183,6 @@ QUESTIONS = {
         ("What is 14 + 5?", "18", "19", "20", "21", "B", "14 + 5 = 19."),
         ("Which equation is correct?", "7 + 2 = 8", "7 + 2 = 9", "7 + 2 = 10", "7 + 2 = 11", "B", "7 + 2 equals 9."),
     ],
-
     3: [
         ("What is 4 × 3?", "7", "10", "12", "14", "C", "4 groups of 3 make 12."),
         ("What is 20 ÷ 5?", "2", "4", "5", "10", "B", "20 divided by 5 equals 4."),
@@ -197,7 +195,6 @@ QUESTIONS = {
         ("What is 7 × 2?", "12", "13", "14", "15", "C", "7 × 2 = 14."),
         ("What is 24 ÷ 6?", "3", "4", "5", "6", "B", "24 divided by 6 equals 4."),
     ],
-
     4: [
         ("What does the denominator of a fraction tell us?", "Number of equal parts in the whole", "The total answer only", "The largest part", "The color of a shape", "A", "The denominator tells how many equal parts make the whole."),
         ("In 3/4, what is the numerator?", "3", "4", "7", "1", "A", "The numerator is the top number, 3."),
@@ -210,7 +207,6 @@ QUESTIONS = {
         ("What fraction means 3 parts out of 8 equal parts?", "3/8", "8/3", "3/5", "5/8", "A", "Three out of eight equal parts is 3/8."),
         ("Which pair represents equivalent fractions?", "1/2 and 2/4", "1/2 and 2/3", "1/3 and 2/5", "1/4 and 3/4", "A", "1/2 and 2/4 have the same value."),
     ],
-
     5: [
         ("Which is a living thing?", "Rock", "Tree", "Chair", "Pencil", "B", "A tree grows and carries out life processes, so it is living."),
         ("Which is non-living?", "Dog", "Bird", "Stone", "Plant", "C", "A stone does not carry out life processes."),
@@ -223,7 +219,6 @@ QUESTIONS = {
         ("Which can respond to its surroundings?", "A living organism", "A stone only", "A chair only", "A metal spoon only", "A", "Living organisms respond to changes in their surroundings."),
         ("Why do living things need energy?", "To carry out life processes", "To become non-living", "To stop growing", "To avoid all change", "A", "Energy is needed for life processes and activity."),
     ],
-
     6: [
         ("Which part usually absorbs water from soil?", "Root", "Flower", "Fruit", "Seed", "A", "Roots commonly absorb water and minerals from the soil."),
         ("Which part supports the plant?", "Stem", "Root hair only", "Fruit", "Seed", "A", "The stem supports the plant and transports materials."),
@@ -236,7 +231,6 @@ QUESTIONS = {
         ("What is one function of a stem?", "Transport water and support the plant", "Digest food like a stomach", "Hear sounds", "Produce electricity", "A", "Stems provide support and help transport water and nutrients."),
         ("Which plant part is usually below the soil?", "Root", "Flower", "Fruit", "Leaf", "A", "Roots are commonly found below the soil."),
     ],
-
     7: [
         ("Which state has a fixed shape?", "Solid", "Liquid", "Gas", "All gases", "A", "A solid has a fixed shape under ordinary conditions."),
         ("Which state takes the shape of its container?", "Liquid", "Solid", "Rock", "Wood", "A", "A liquid flows and takes the shape of its container."),
@@ -249,7 +243,6 @@ QUESTIONS = {
         ("Which is a solid?", "Book", "Milk", "Air", "Steam", "A", "A book is a solid object."),
         ("Which change turns liquid water into ice?", "Freezing", "Melting", "Boiling", "Evaporation only", "A", "Freezing changes liquid water into solid ice."),
     ],
-
     8: [
         ("Which organ pumps blood?", "Heart", "Lungs", "Brain", "Stomach", "A", "The heart pumps blood around the body."),
         ("Which organs help us breathe?", "Lungs", "Kidneys", "Bones", "Teeth", "A", "The lungs exchange gases during breathing."),
@@ -262,7 +255,6 @@ QUESTIONS = {
         ("Which is a healthy habit?", "Eating a balanced diet", "Drinking no water", "Never exercising", "Sleeping only one hour daily", "A", "A balanced diet supports health."),
         ("Why do humans breathe?", "To exchange gases needed by the body", "To make bones disappear", "To stop digestion", "To become non-living", "A", "Breathing supplies oxygen and removes carbon dioxide."),
     ],
-
     9: [
         ("How many letters are in the English alphabet?", "24", "25", "26", "27", "C", "The English alphabet has 26 letters."),
         ("Which is a vowel?", "B", "E", "T", "R", "B", "E is a vowel."),
@@ -275,7 +267,6 @@ QUESTIONS = {
         ("Which word starts with a vowel?", "Apple", "Ball", "Cat", "Dog", "A", "Apple begins with the vowel A."),
         ("Which letter comes before Z?", "X", "Y", "W", "V", "B", "Y comes immediately before Z."),
     ],
-
     10: [
         ("Which word is a noun?", "Teacher", "Quickly", "Run", "Beautiful", "A", "Teacher names a person and is a noun."),
         ("Which pronoun can replace 'Riya'?", "She", "They are", "It", "Those", "A", "She can replace the singular female name Riya."),
@@ -288,7 +279,6 @@ QUESTIONS = {
         ("Which word can replace 'the book'?", "It", "He", "She", "They", "A", "It can refer to a singular non-human object such as a book."),
         ("Which sentence uses a pronoun?", "She reads a book.", "Book reads she.", "Read book she.", "Reads a she.", "A", "She is a pronoun used as the subject."),
     ],
-
     11: [
         ("Which word is a verb?", "Run", "Blue", "Table", "Happy", "A", "Run describes an action."),
         ("In 'The child reads', what is the verb?", "The", "child", "reads", "none", "C", "Reads is the action word."),
@@ -301,7 +291,6 @@ QUESTIONS = {
         ("Which is a verb?", "Sing", "Song", "Singer", "School", "A", "Sing is an action verb."),
         ("What do verbs often describe?", "Actions or states", "Only colors", "Only places", "Only numbers", "A", "Verbs commonly describe actions or states."),
     ],
-
     12: [
         ("Which sentence is complete?", "The boy plays.", "Boy the.", "Plays boy the.", "The.", "A", "The boy plays expresses a complete idea."),
         ("Which punctuation can end a statement?", ".", ",", ":", "(", "A", "A full stop commonly ends a statement."),
@@ -314,7 +303,6 @@ QUESTIONS = {
         ("Which sentence asks a question?", "Where are you?", "I am here.", "The sun shines.", "She reads.", "A", "Where are you? is a question."),
         ("Which sentence is correctly ordered?", "Children play outside.", "Play children outside.", "Outside children play?", "Children outside.", "A", "Children play outside is a clear complete sentence."),
     ],
-
     13: [
         ("Who commonly teaches students?", "Teacher", "Stone", "Bottle", "Chair", "A", "A teacher commonly teaches students."),
         ("Who may help sick people?", "Doctor", "Driver only", "Painter only", "Carpenter only", "A", "Doctors help diagnose and treat illness."),
@@ -327,7 +315,6 @@ QUESTIONS = {
         ("What is cooperation?", "Working together", "Working against everyone", "Avoiding all communication", "Refusing help", "A", "Cooperation means working together toward a shared purpose."),
         ("Which action supports a community?", "Helping others", "Damaging public property", "Wasting water", "Littering", "A", "Helping others supports community well-being."),
     ],
-
     14: [
         ("Why is water important?", "Living things need it", "Only machines need it", "It is never used", "It has no purpose", "A", "People, animals and plants need water."),
         ("Which action saves water?", "Close the tap after use", "Leave the tap running", "Break a pipe", "Waste clean water", "A", "Closing taps reduces unnecessary water use."),
@@ -340,7 +327,6 @@ QUESTIONS = {
         ("Which is a water-saving habit?", "Use a bucket when suitable", "Keep taps open", "Wash roads with clean water unnecessarily", "Ignore leaks", "A", "Using only the needed amount of water can reduce wastage."),
         ("Why should water be kept clean?", "To protect health and ecosystems", "To make it useless", "To increase pollution", "To remove all life", "A", "Clean water is important for health and the environment."),
     ],
-
     15: [
         ("What do plants provide to many animals and people?", "Food", "Plastic only", "Metal only", "Electricity only", "A", "Plants are important sources of food."),
         ("Which is an animal?", "Elephant", "Mango tree", "Grass", "Rose", "A", "An elephant is an animal."),
@@ -353,7 +339,6 @@ QUESTIONS = {
         ("How do plants help ecosystems?", "They provide food and habitats", "They remove all animals", "They stop every process", "They make all water salty", "A", "Plants support food chains and provide habitats."),
         ("Which action harms biodiversity?", "Destroying natural habitats", "Planting native trees", "Protecting forests", "Reducing pollution", "A", "Habitat destruction can reduce biodiversity."),
     ],
-
     16: [
         ("What is a good environmental habit?", "Use bins for waste", "Throw waste on roads", "Pollute rivers", "Burn all plastic", "A", "Using bins helps keep surroundings clean."),
         ("What can recycling help do?", "Reduce waste", "Increase litter", "Pollute more", "Waste resources", "A", "Recycling can reduce the amount of waste sent for disposal."),
@@ -366,7 +351,6 @@ QUESTIONS = {
         ("Which is a clean-energy example?", "Solar energy", "Plastic burning", "Open waste burning", "Oil spill", "A", "Solar energy comes from sunlight and is renewable."),
         ("Why is cleanliness important?", "It supports health and a safe environment", "It increases litter", "It prevents hygiene", "It creates pollution", "A", "Clean surroundings support health and safety."),
     ],
-
     17: [
         ("Which device is used for typing?", "Keyboard", "Monitor", "Speaker", "Printer", "A", "A keyboard is used to enter text."),
         ("Which device displays information?", "Monitor", "Keyboard", "Mouse pad", "Cable", "A", "A monitor displays visual information."),
@@ -379,7 +363,6 @@ QUESTIONS = {
         ("Which device is commonly used to hear sound?", "Speaker", "Keyboard", "Mouse", "Scanner", "A", "Speakers output audio."),
         ("Which device can capture a paper document digitally?", "Scanner", "Speaker", "Keyboard", "Monitor", "A", "A scanner converts paper documents into digital images."),
     ],
-
     18: [
         ("What software is used to open websites?", "Web browser", "Calculator only", "Paint only", "File cabinet", "A", "A web browser is used to access websites."),
         ("What is a website?", "A collection of web pages and resources", "A physical notebook", "A keyboard key", "A computer cable", "A", "A website can contain related web pages and resources."),
@@ -392,7 +375,6 @@ QUESTIONS = {
         ("What should you check before downloading a file?", "Source and file safety", "Only the file color", "Only the font", "Only the screen size", "A", "Checking the source and safety reduces risk."),
         ("Which is an online communication tool?", "Email", "Keyboard", "Monitor", "Mouse", "A", "Email is an internet-based communication method."),
     ],
-
     19: [
         ("Should you share your password with strangers?", "No", "Yes", "Always", "Publicly", "A", "Passwords should be kept private."),
         ("What makes a password stronger?", "A long combination of different characters", "Your name only", "123456", "password", "A", "Long, unpredictable passwords are harder to guess."),
@@ -405,7 +387,6 @@ QUESTIONS = {
         ("What should you do before entering credentials on a website?", "Check the website and connection carefully", "Trust every link", "Ignore the address", "Share credentials first", "A", "Checking the destination can help avoid phishing and unsafe sites."),
         ("What is phishing?", "A deceptive attempt to obtain sensitive information", "A computer game", "A printer process", "A file format", "A", "Phishing uses deception to obtain sensitive information."),
     ],
-
     20: [
         ("Why should you take breaks from screens?", "To reduce strain and support healthy use", "To damage your eyes", "To stop learning", "To avoid all technology", "A", "Regular breaks can reduce discomfort and support healthier screen use."),
         ("How should you communicate online?", "Respectfully", "Abusively", "By sharing secrets", "By threatening others", "A", "Respectful communication supports a safe digital environment."),
@@ -421,64 +402,54 @@ QUESTIONS = {
 }
 
 
-def reset_sequence(db, table_name):
+def sync_sequence(db, table_name):
     """
-    Synchronize PostgreSQL ID sequence with the current maximum ID.
-
-    This prevents:
-    duplicate key value violates unique constraint
-    errors when existing Render records already use low IDs.
+    Synchronize PostgreSQL auto-increment sequence with MAX(id).
+    This works even when rows already exist in the table.
     """
 
-    result = db.execute(
+    sequence_name = db.execute(
         text(
-            f"""
-            SELECT pg_get_serial_sequence('{table_name}', 'id')
-            """
+            f"SELECT pg_get_serial_sequence('{table_name}', 'id')"
         )
     ).scalar()
 
-    if not result:
-        print(f"Sequence not found for table: {table_name}")
+    if not sequence_name:
+        print(f"No sequence found for table: {table_name}")
         return
 
     max_id = db.execute(
         text(f"SELECT COALESCE(MAX(id), 0) FROM {table_name}")
     ).scalar()
 
-    next_id = int(max_id) + 1
+    max_id = int(max_id or 0)
 
-    db.execute(
-        text(
-            f"""
-            SELECT setval(
-                '{result}',
-                :next_id,
-                false
-            )
-            """
-        ),
-        {"next_id": next_id},
-    )
+    if max_id == 0:
+        db.execute(
+            text(f"SELECT setval('{sequence_name}', 1, false)")
+        )
+    else:
+        db.execute(
+            text(f"SELECT setval('{sequence_name}', :max_id, true)"),
+            {"max_id": max_id},
+        )
 
     print(
-        f"Sequence fixed: {table_name} -> next id will be {next_id}"
+        f"Sequence synced: {table_name} | max_id={max_id} | sequence={sequence_name}"
     )
 
 
-def reset_all_sequences(db):
+def sync_all_sequences(db):
     """
-    Reset sequences for all tables used by this seed.
+    Sync all important primary-key sequences before inserting data.
     """
 
-    tables = [
+    for table_name in [
         "subjects",
         "lessons",
         "quiz_questions",
-    ]
-
-    for table in tables:
-        reset_sequence(db, table)
+    ]:
+        sync_sequence(db, table_name)
 
     db.commit()
 
@@ -499,276 +470,232 @@ def get_teacher(db):
     return user
 
 
-def main():
-    db = SessionLocal()
+def seed_subjects(db):
+    subject_map = {}
 
-    try:
-        print("=" * 70)
-        print("SIH VERNACULAR EDUCATION - CURRICULUM SEED")
-        print("=" * 70)
+    for name, description, language in SUBJECTS:
 
-        # ---------------------------------------------------------
-        # STEP 1: Synchronize PostgreSQL sequences
-        # ---------------------------------------------------------
-
-        print("\n[1/4] Fixing PostgreSQL ID sequences...")
-
-        reset_all_sequences(db)
-
-        print("PostgreSQL sequences synchronized successfully.")
-
-        # ---------------------------------------------------------
-        # STEP 2: Find teacher/admin user
-        # ---------------------------------------------------------
-
-        print("\n[2/4] Finding teacher/admin user...")
-
-        teacher = get_teacher(db)
-
-        print(
-            f"Using teacher/admin user: "
-            f"{teacher.name} (id={teacher.id}, role={teacher.role})"
+        subject = (
+            db.query(models.Subject)
+            .filter(models.Subject.name == name)
+            .first()
         )
 
-        # ---------------------------------------------------------
-        # STEP 3: Create subjects
-        # ---------------------------------------------------------
-
-        print("\n[3/4] Creating/checking subjects...")
-
-        subject_map = {}
-
-        for name, description, language in SUBJECTS:
-
-            subject = (
-                db.query(models.Subject)
-                .filter(models.Subject.name == name)
-                .first()
+        if subject:
+            print(
+                f"Subject already exists: {name} (id={subject.id})"
             )
 
-            if not subject:
+            # Update existing subject information
+            subject.description = description
+            subject.language = language
+            subject.is_active = True
 
-                subject = models.Subject(
-                    name=name,
-                    description=description,
-                    language=language,
-                    is_active=True,
-                )
-
-                db.add(subject)
-                db.flush()
-
-                print(
-                    f"Created subject: {name} "
-                    f"(id={subject.id})"
-                )
-
-            else:
-
-                print(
-                    f"Subject already exists: {name} "
-                    f"(id={subject.id})"
-                )
-
-                # Update existing subject information
-                subject.description = description
-                subject.language = language
-                subject.is_active = True
-
-            subject_map[name] = subject.id
-
-        db.commit()
-
-        # ---------------------------------------------------------
-        # STEP 4: Create lessons
-        # ---------------------------------------------------------
-
-        print("\nCreating/checking 20 lessons...")
-
-        lesson_map = {}
-
-        for subject_no, title, description, content in LESSONS:
-
-            subject_name = SUBJECTS[subject_no - 1][0]
-
-            subject_id = subject_map[subject_name]
-
-            lesson = (
-                db.query(models.Lesson)
-                .filter(models.Lesson.title == title)
-                .first()
+        else:
+            subject = models.Subject(
+                name=name,
+                description=description,
+                language=language,
+                is_active=True,
             )
 
-            if not lesson:
+            db.add(subject)
+            db.flush()
 
-                lesson = models.Lesson(
-                    title=title,
-                    description=description,
-                    content=content,
-                    language="Hindi",
-                    subject_id=subject_id,
-                    created_by=teacher.id,
-                )
-
-                db.add(lesson)
-                db.flush()
-
-                print(
-                    f"Created lesson: {title} "
-                    f"(id={lesson.id})"
-                )
-
-            else:
-
-                print(
-                    f"Lesson already exists: {title} "
-                    f"(id={lesson.id})"
-                )
-
-                # Update existing lesson content
-                lesson.description = description
-                lesson.content = content
-                lesson.language = "Hindi"
-                lesson.subject_id = subject_id
-                lesson.created_by = teacher.id
-
-            lesson_map[title] = lesson.id
-
-        db.commit()
-
-        # ---------------------------------------------------------
-        # STEP 5: Synchronize sequences again
-        # ---------------------------------------------------------
-
-        print("\nSynchronizing sequences after subjects/lessons...")
-
-        reset_all_sequences(db)
-
-        # ---------------------------------------------------------
-        # STEP 6: Add quiz questions
-        # ---------------------------------------------------------
-
-        print("\n[4/4] Creating/checking quiz questions...")
-
-        total_questions_added = 0
-
-        for lesson_index, lesson_row in enumerate(
-            LESSONS,
-            start=1,
-        ):
-
-            _, title, _, _ = lesson_row
-
-            lesson_id = lesson_map[title]
-
-            existing_count = (
-                db.query(models.QuizQuestion)
-                .filter(
-                    models.QuizQuestion.lesson_id == lesson_id
-                )
-                .count()
+            print(
+                f"Created subject: {name} (id={subject.id})"
             )
 
-            if existing_count >= 10:
+        subject_map[name] = subject.id
 
-                print(
-                    f"Questions already present for: "
-                    f"{title} ({existing_count})"
-                )
+    db.commit()
 
-                continue
+    # New rows may have been created, so sync again.
+    sync_sequence(db, "subjects")
+    db.commit()
 
-            questions_to_add = QUESTIONS.get(
-                lesson_index,
-                [],
+    return subject_map
+
+
+def seed_lessons(db, subject_map, teacher):
+    lesson_map = {}
+
+    for subject_no, title, description, content in LESSONS:
+
+        subject_name = SUBJECTS[subject_no - 1][0]
+        subject_id = subject_map[subject_name]
+
+        lesson = (
+            db.query(models.Lesson)
+            .filter(models.Lesson.title == title)
+            .first()
+        )
+
+        if lesson:
+
+            print(
+                f"Lesson already exists: {title} (id={lesson.id})"
             )
 
-            for q in questions_to_add:
+            # Update existing lesson
+            lesson.description = description
+            lesson.content = content
+            lesson.language = "Hindi"
+            lesson.subject_id = subject_id
 
-                (
-                    question_text,
-                    option_a,
-                    option_b,
-                    option_c,
-                    option_d,
-                    correct,
-                    explanation,
-                ) = q
+        else:
 
-                question = models.QuizQuestion(
+            lesson = models.Lesson(
+                title=title,
+                description=description,
+                content=content,
+                language="Hindi",
+                subject_id=subject_id,
+                created_by=teacher.id,
+            )
+
+            db.add(lesson)
+            db.flush()
+
+            print(
+                f"Created lesson: {title} (id={lesson.id})"
+            )
+
+        lesson_map[title] = lesson.id
+
+    db.commit()
+
+    sync_sequence(db, "lessons")
+    db.commit()
+
+    return lesson_map
+
+
+def seed_questions(db, lesson_map):
+
+    for lesson_index, lesson_row in enumerate(
+        LESSONS,
+        start=1,
+    ):
+
+        _, title, _, _ = lesson_row
+
+        lesson_id = lesson_map[title]
+
+        existing_count = (
+            db.query(models.QuizQuestion)
+            .filter(
+                models.QuizQuestion.lesson_id == lesson_id
+            )
+            .count()
+        )
+
+        if existing_count >= 10:
+
+            print(
+                f"Questions already present for: "
+                f"{title} ({existing_count})"
+            )
+
+            continue
+
+        questions_to_add = QUESTIONS[lesson_index]
+
+        for q in questions_to_add:
+
+            (
+                question_text,
+                option_a,
+                option_b,
+                option_c,
+                option_d,
+                correct_answer,
+                explanation,
+            ) = q
+
+            db.add(
+                models.QuizQuestion(
                     lesson_id=lesson_id,
                     question=question_text,
                     option_a=option_a,
                     option_b=option_b,
                     option_c=option_c,
                     option_d=option_d,
-                    correct_answer=correct,
+                    correct_answer=correct_answer,
                     explanation=explanation,
                 )
-
-                db.add(question)
-
-                total_questions_added += 1
-
-            db.commit()
-
-            print(
-                f"Added {len(questions_to_add)} quiz questions: "
-                f"{title}"
             )
 
-        # ---------------------------------------------------------
-        # STEP 7: Final sequence synchronization
-        # ---------------------------------------------------------
-
-        print("\nFinal PostgreSQL sequence synchronization...")
-
-        reset_all_sequences(db)
-
-        # ---------------------------------------------------------
-        # FINAL SUMMARY
-        # ---------------------------------------------------------
-
-        total_subjects = (
-            db.query(models.Subject).count()
-        )
-
-        total_lessons = (
-            db.query(models.Lesson).count()
-        )
-
-        total_questions = (
-            db.query(models.QuizQuestion).count()
-        )
-
-        print("\n" + "=" * 70)
-        print("SEED COMPLETED SUCCESSFULLY")
-        print("=" * 70)
-
-        print(f"Subjects in database : {total_subjects}")
-        print(f"Lessons in database  : {total_lessons}")
-        print(f"Quiz questions       : {total_questions}")
-        print(f"Questions added now  : {total_questions_added}")
-
-        print("\nDONE: 5 subjects, 20 lessons and up to 200 quiz questions are ready.")
+        db.commit()
 
         print(
-            "Random quiz endpoint will select "
-            "5 questions from each lesson's question bank."
+            f"Added {len(questions_to_add)} quiz questions: {title}"
         )
 
+    sync_sequence(db, "quiz_questions")
+    db.commit()
+
+
+def main():
+
+    db = SessionLocal()
+
+    try:
+
+        print("=" * 70)
+        print("SIH VERNACULAR EDUCATION - CURRICULUM SEED")
         print("=" * 70)
 
-    except Exception as e:
+        # IMPORTANT:
+        # Existing Render database already contains rows.
+        # Synchronize sequences BEFORE inserting anything.
+        sync_all_sequences(db)
+
+        teacher = get_teacher(db)
+
+        print(
+            f"Using teacher/admin user: "
+            f"{teacher.name} (id={teacher.id})"
+        )
+
+        print("\n--- SEEDING SUBJECTS ---")
+
+        subject_map = seed_subjects(db)
+
+        print("\n--- SEEDING LESSONS ---")
+
+        lesson_map = seed_lessons(
+            db,
+            subject_map,
+            teacher,
+        )
+
+        print("\n--- SEEDING QUIZ QUESTIONS ---")
+
+        seed_questions(
+            db,
+            lesson_map,
+        )
+
+        # Final sequence synchronization.
+        sync_all_sequences(db)
+
+        print("\n" + "=" * 70)
+        print(
+            "DONE: 5 subjects, 20 lessons and up to "
+            "200 quiz questions are ready."
+        )
+        print(
+            "Random quiz endpoint will select 5 questions "
+            "from each lesson's question bank."
+        )
+        print("=" * 70)
+
+    except Exception:
 
         db.rollback()
 
-        print("\n" + "=" * 70)
-        print("SEED FAILED")
-        print("=" * 70)
-
-        print(f"Error: {e}")
-
+        print("\nSEED FAILED.")
         raise
 
     finally:
