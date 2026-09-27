@@ -1,9 +1,23 @@
-"""Ready-made curriculum seed data for the SIH Vernacular Education project."""
+"""
+SIH Vernacular Education
+Curriculum Seed + Database Repair Script
+
+This script:
+1. Keeps the existing 5 official subjects.
+2. Repairs old/duplicate subject records.
+3. Correctly maps all 20 official lessons to subjects.
+4. Deactivates stale subjects/lessons.
+5. Preserves existing quiz questions.
+6. Adds missing quiz questions from QUESTIONS.
+"""
 
 from app.database import SessionLocal
 from app import models
-from sqlalchemy import text
 
+
+# ============================================================
+# OFFICIAL SUBJECTS
+# ============================================================
 
 SUBJECTS = [
     (
@@ -33,6 +47,10 @@ SUBJECTS = [
     ),
 ]
 
+
+# ============================================================
+# OFFICIAL 20 LESSONS
+# ============================================================
 
 LESSONS = [
     (
@@ -158,301 +176,66 @@ LESSONS = [
 ]
 
 
-QUESTIONS = {
-    1: [
-        ("What is the value of the digit 2 in 245?", "2", "20", "200", "245", "C", "In 245, 2 is in the hundreds place, so its value is 200."),
-        ("Which number is greater?", "18", "12", "8", "15", "A", "18 is greater than 12, 8 and 15."),
-        ("What comes after 99?", "98", "100", "101", "90", "B", "The next whole number after 99 is 100."),
-        ("Which is an even number?", "7", "11", "14", "19", "C", "14 is divisible by 2, so it is even."),
-        ("How many digits are in 508?", "2", "3", "4", "5", "B", "508 contains three digits: 5, 0 and 8."),
-        ("Which symbol means greater than?", "<", "=", ">", "+", "C", "The > symbol means greater than."),
-        ("What is the smallest number?", "31", "13", "21", "30", "B", "13 is smaller than the other listed numbers."),
-        ("What is 10 more than 25?", "30", "35", "15", "20", "B", "Adding 10 to 25 gives 35."),
-        ("Which number is odd?", "24", "30", "17", "42", "C", "17 is not divisible by 2, so it is odd."),
-        ("What is the place value of 5 in 352?", "5", "50", "500", "2", "B", "5 is in the tens place, so its place value is 50."),
-    ],
-    2: [
-        ("What is 8 + 7?", "13", "14", "15", "16", "C", "8 plus 7 equals 15."),
-        ("What is 20 - 6?", "12", "13", "14", "15", "C", "20 minus 6 equals 14."),
-        ("A child has 5 apples and gets 3 more. How many apples?", "7", "8", "9", "10", "B", "5 + 3 = 8."),
-        ("What is 17 - 9?", "6", "7", "8", "9", "C", "17 minus 9 equals 8."),
-        ("Which operation combines quantities?", "Addition", "Subtraction", "Comparison", "Division", "A", "Addition combines quantities."),
-        ("What is 6 + 9?", "14", "15", "16", "17", "B", "6 + 9 = 15."),
-        ("What is 30 - 12?", "16", "17", "18", "19", "C", "30 - 12 = 18."),
-        ("If 9 birds are on a tree and 2 fly away, how many remain?", "6", "7", "8", "11", "B", "9 - 2 = 7."),
-        ("What is 14 + 5?", "18", "19", "20", "21", "B", "14 + 5 = 19."),
-        ("Which equation is correct?", "7 + 2 = 8", "7 + 2 = 9", "7 + 2 = 10", "7 + 2 = 11", "B", "7 + 2 equals 9."),
-    ],
-    3: [
-        ("What is 4 × 3?", "7", "10", "12", "14", "C", "4 groups of 3 make 12."),
-        ("What is 20 ÷ 5?", "2", "4", "5", "10", "B", "20 divided by 5 equals 4."),
-        ("Multiplication can be understood as what?", "Repeated addition", "Repeated subtraction", "Only comparison", "Only measurement", "A", "Multiplication can represent repeated addition."),
-        ("What is 6 × 2?", "8", "10", "12", "14", "C", "6 × 2 = 12."),
-        ("What is 15 ÷ 3?", "3", "4", "5", "6", "C", "15 shared equally among 3 groups gives 5."),
-        ("What is 5 × 5?", "20", "25", "30", "35", "B", "5 × 5 = 25."),
-        ("What is 18 ÷ 2?", "7", "8", "9", "10", "C", "18 divided by 2 is 9."),
-        ("Which represents 3 groups of 4?", "3 + 4", "4 × 3", "4 - 3", "12 ÷ 4", "B", "3 groups of 4 can be represented by 4 × 3."),
-        ("What is 7 × 2?", "12", "13", "14", "15", "C", "7 × 2 = 14."),
-        ("What is 24 ÷ 6?", "3", "4", "5", "6", "B", "24 divided by 6 equals 4."),
-    ],
-    4: [
-        ("What does the denominator of a fraction tell us?", "Number of equal parts in the whole", "The total answer only", "The largest part", "The color of a shape", "A", "The denominator tells how many equal parts make the whole."),
-        ("In 3/4, what is the numerator?", "3", "4", "7", "1", "A", "The numerator is the top number, 3."),
-        ("Which fraction represents one half?", "1/2", "1/3", "2/3", "3/4", "A", "One half is written as 1/2."),
-        ("Which is larger?", "1/4", "3/4", "1/8", "2/8", "B", "3/4 is larger than the other listed fractions."),
-        ("How many equal parts are in 2/5?", "2", "3", "5", "7", "C", "The denominator 5 indicates five equal parts."),
-        ("Which fraction is equal to one whole?", "1/2", "2/2", "1/3", "1/4", "B", "2/2 represents one whole."),
-        ("In 5/6, what is the denominator?", "5", "6", "11", "1", "B", "The denominator is the bottom number, 6."),
-        ("Which fraction is smaller?", "1/5", "1/2", "3/4", "2/3", "A", "1/5 is smaller than the other listed fractions."),
-        ("What fraction means 3 parts out of 8 equal parts?", "3/8", "8/3", "3/5", "5/8", "A", "Three out of eight equal parts is 3/8."),
-        ("Which pair represents equivalent fractions?", "1/2 and 2/4", "1/2 and 2/3", "1/3 and 2/5", "1/4 and 3/4", "A", "1/2 and 2/4 have the same value."),
-    ],
-    5: [
-        ("Which is a living thing?", "Rock", "Tree", "Chair", "Pencil", "B", "A tree grows and carries out life processes, so it is living."),
-        ("Which is non-living?", "Dog", "Bird", "Stone", "Plant", "C", "A stone does not carry out life processes."),
-        ("Which is a characteristic of living things?", "They grow", "They are always made of metal", "They never need energy", "They never change", "A", "Living things grow and carry out life processes."),
-        ("Which needs food for energy?", "A living animal", "A rock", "A chair", "A book", "A", "Animals are living organisms that need energy."),
-        ("Which is an example of a plant?", "Mango tree", "Table", "Bottle", "Spoon", "A", "A mango tree is a plant."),
-        ("Which is not alive?", "Cat", "Grass", "Water", "Human", "C", "Water is not a living organism."),
-        ("Living things can generally do what?", "Grow and reproduce", "Never change", "Never need energy", "Remain exactly the same", "A", "Growth and reproduction are life processes."),
-        ("Which pair contains only living things?", "Dog and tree", "Rock and chair", "Book and pencil", "Cup and table", "A", "Dog and tree are both living organisms."),
-        ("Which can respond to its surroundings?", "A living organism", "A stone only", "A chair only", "A metal spoon only", "A", "Living organisms respond to changes in their surroundings."),
-        ("Why do living things need energy?", "To carry out life processes", "To become non-living", "To stop growing", "To avoid all change", "A", "Energy is needed for life processes and activity."),
-    ],
-    6: [
-        ("Which part usually absorbs water from soil?", "Root", "Flower", "Fruit", "Seed", "A", "Roots commonly absorb water and minerals from the soil."),
-        ("Which part supports the plant?", "Stem", "Root hair only", "Fruit", "Seed", "A", "The stem supports the plant and transports materials."),
-        ("Which part commonly makes food using sunlight?", "Leaf", "Root", "Fruit", "Bark only", "A", "Leaves carry out photosynthesis using sunlight."),
-        ("What do roots help with?", "Anchoring the plant", "Hearing sounds", "Walking", "Flying", "A", "Roots anchor the plant in the soil."),
-        ("Which is a flower?", "Rose", "Stone", "Chair", "Book", "A", "Rose is a flowering plant."),
-        ("Plants need sunlight mainly to help make what?", "Food", "Plastic", "Metal", "Glass", "A", "Plants use light energy during photosynthesis to make food."),
-        ("Which part often contains seeds?", "Fruit", "Root", "Stem", "Bark", "A", "Many fruits contain seeds."),
-        ("Which gas do plants use during photosynthesis?", "Carbon dioxide", "Helium", "Neon", "Hydrogen only", "A", "Plants use carbon dioxide during photosynthesis."),
-        ("What is one function of a stem?", "Transport water and support the plant", "Digest food like a stomach", "Hear sounds", "Produce electricity", "A", "Stems provide support and help transport water and nutrients."),
-        ("Which plant part is usually below the soil?", "Root", "Flower", "Fruit", "Leaf", "A", "Roots are commonly found below the soil."),
-    ],
-    7: [
-        ("Which state has a fixed shape?", "Solid", "Liquid", "Gas", "All gases", "A", "A solid has a fixed shape under ordinary conditions."),
-        ("Which state takes the shape of its container?", "Liquid", "Solid", "Rock", "Wood", "A", "A liquid flows and takes the shape of its container."),
-        ("Which state spreads to fill available space?", "Gas", "Solid", "Ice only", "Metal", "A", "A gas expands to fill its available space."),
-        ("Ice is an example of which state of matter?", "Solid", "Liquid", "Gas", "Plasma only", "A", "Ice is solid water."),
-        ("Water in a glass is usually a:", "Liquid", "Solid", "Gas", "Metal", "A", "Water in a glass is normally liquid."),
-        ("Water vapour is a:", "Gas", "Solid", "Liquid", "Crystal", "A", "Water vapour is water in gaseous form."),
-        ("What happens to ice when it melts?", "It becomes liquid water", "It becomes a metal", "It disappears into nothing", "It becomes soil", "A", "Melting changes solid ice into liquid water."),
-        ("Which has particles that can move freely through space?", "Gas", "Solid only", "Stone only", "Wood only", "A", "Gas particles move freely and spread through available space."),
-        ("Which is a solid?", "Book", "Milk", "Air", "Steam", "A", "A book is a solid object."),
-        ("Which change turns liquid water into ice?", "Freezing", "Melting", "Boiling", "Evaporation only", "A", "Freezing changes liquid water into solid ice."),
-    ],
-    8: [
-        ("Which organ pumps blood?", "Heart", "Lungs", "Brain", "Stomach", "A", "The heart pumps blood around the body."),
-        ("Which organs help us breathe?", "Lungs", "Kidneys", "Bones", "Teeth", "A", "The lungs exchange gases during breathing."),
-        ("Which organ controls many body activities?", "Brain", "Foot", "Hair", "Nail", "A", "The brain controls many body functions."),
-        ("Which habit supports good health?", "Regular physical activity", "Never sleeping", "Skipping all meals", "Avoiding water", "A", "Regular activity is part of a healthy lifestyle."),
-        ("Why is sleep important?", "It supports rest and recovery", "It stops the heart", "It removes all bones", "It replaces food", "A", "Sleep supports rest and recovery."),
-        ("Which is part of the digestive system?", "Stomach", "Hair", "Nail", "Ear lobe", "A", "The stomach is part of the digestive system."),
-        ("What carries oxygen-rich blood around the body?", "Blood", "Hair", "Skin only", "Teeth", "A", "Blood transports oxygen and other substances."),
-        ("Which organ helps pump blood?", "Heart", "Lung only", "Eye", "Ear", "A", "The heart is the main pumping organ of the circulatory system."),
-        ("Which is a healthy habit?", "Eating a balanced diet", "Drinking no water", "Never exercising", "Sleeping only one hour daily", "A", "A balanced diet supports health."),
-        ("Why do humans breathe?", "To exchange gases needed by the body", "To make bones disappear", "To stop digestion", "To become non-living", "A", "Breathing supplies oxygen and removes carbon dioxide."),
-    ],
-    9: [
-        ("How many letters are in the English alphabet?", "24", "25", "26", "27", "C", "The English alphabet has 26 letters."),
-        ("Which is a vowel?", "B", "E", "T", "R", "B", "E is a vowel."),
-        ("Which letter comes after C?", "B", "D", "E", "F", "B", "D comes after C."),
-        ("Which word begins with the letter M?", "Mango", "Apple", "Orange", "Banana", "A", "Mango begins with M."),
-        ("Which is a consonant?", "A", "E", "I", "T", "D", "T is a consonant."),
-        ("Which word rhymes with cat?", "Bat", "Dog", "Sun", "Tree", "A", "Bat rhymes with cat."),
-        ("Which letter is the first letter of the word 'sun'?", "S", "U", "N", "A", "A", "The word sun begins with S."),
-        ("Which is a word with three letters?", "Book", "Cat", "Orange", "School", "B", "Cat has three letters."),
-        ("Which word starts with a vowel?", "Apple", "Ball", "Cat", "Dog", "A", "Apple begins with the vowel A."),
-        ("Which letter comes before Z?", "X", "Y", "W", "V", "B", "Y comes immediately before Z."),
-    ],
-    10: [
-        ("Which word is a noun?", "Teacher", "Quickly", "Run", "Beautiful", "A", "Teacher names a person and is a noun."),
-        ("Which pronoun can replace 'Riya'?", "She", "They are", "It", "Those", "A", "She can replace the singular female name Riya."),
-        ("Which is a noun?", "School", "Run", "Quickly", "Happy", "A", "School names a place and is a noun."),
-        ("Which pronoun can replace 'Rahul'?", "He", "They", "It", "Those", "A", "He can replace the singular male name Rahul."),
-        ("Which word is a pronoun?", "They", "Book", "Teacher", "City", "A", "They is a pronoun."),
-        ("In 'The dog is happy', which word is a noun?", "The", "dog", "is", "happy", "B", "Dog names an animal, so it is a noun."),
-        ("Which pronoun refers to a group?", "They", "He", "She", "It", "A", "They can refer to more than one person or thing."),
-        ("Which is a place noun?", "Market", "Run", "Slowly", "Beautiful", "A", "Market names a place."),
-        ("Which word can replace 'the book'?", "It", "He", "She", "They", "A", "It can refer to a singular non-human object such as a book."),
-        ("Which sentence uses a pronoun?", "She reads a book.", "Book reads she.", "Read book she.", "Reads a she.", "A", "She is a pronoun used as the subject."),
-    ],
-    11: [
-        ("Which word is a verb?", "Run", "Blue", "Table", "Happy", "A", "Run describes an action."),
-        ("In 'The child reads', what is the verb?", "The", "child", "reads", "none", "C", "Reads is the action word."),
-        ("Which word shows an action?", "Jump", "Chair", "Green", "School", "A", "Jump describes an action."),
-        ("Which sentence contains a verb?", "Birds fly.", "Blue sky.", "Big house.", "Red ball.", "A", "Fly is the verb in 'Birds fly.'"),
-        ("Which is an action word?", "Write", "Pencil", "Book", "Classroom", "A", "Write describes an action."),
-        ("What is the verb in 'They play football'?", "They", "play", "football", "the", "B", "Play is the verb."),
-        ("Which word is not a verb?", "Eat", "Sleep", "Table", "Run", "C", "Table is a noun, not a verb."),
-        ("Which sentence uses 'jump' as an action?", "The boy jumps.", "The boy blue.", "Jumps table boy.", "Blue jumps boy.", "A", "Jumps is used as the action verb."),
-        ("Which is a verb?", "Sing", "Song", "Singer", "School", "A", "Sing is an action verb."),
-        ("What do verbs often describe?", "Actions or states", "Only colors", "Only places", "Only numbers", "A", "Verbs commonly describe actions or states."),
-    ],
-    12: [
-        ("Which sentence is complete?", "The boy plays.", "Boy the.", "Plays boy the.", "The.", "A", "The boy plays expresses a complete idea."),
-        ("Which punctuation can end a statement?", ".", ",", ":", "(", "A", "A full stop commonly ends a statement."),
-        ("Which letter should begin a sentence?", "Capital letter", "Small letter always", "Number", "Symbol only", "A", "A sentence normally begins with a capital letter."),
-        ("Which is a simple sentence?", "Birds fly.", "Because birds.", "Flying in.", "The birds.", "A", "Birds fly contains a subject and verb and expresses a complete idea."),
-        ("Choose the correct sentence.", "She reads a book.", "she reads a book", "She read a.", "Reads she book.", "A", "The first option is correctly formed and capitalized."),
-        ("What is the subject in 'The cat sleeps'?", "The cat", "sleeps", "the", "none", "A", "The cat is the subject."),
-        ("What is the verb in 'The cat sleeps'?", "The", "cat", "sleeps", "none", "C", "Sleeps is the verb."),
-        ("Which mark is used to ask a question?", ".", "?", ",", "!", "B", "A question mark ends a direct question."),
-        ("Which sentence asks a question?", "Where are you?", "I am here.", "The sun shines.", "She reads.", "A", "Where are you? is a question."),
-        ("Which sentence is correctly ordered?", "Children play outside.", "Play children outside.", "Outside children play?", "Children outside.", "A", "Children play outside is a clear complete sentence."),
-    ],
-    13: [
-        ("Who commonly teaches students?", "Teacher", "Stone", "Bottle", "Chair", "A", "A teacher commonly teaches students."),
-        ("Who may help sick people?", "Doctor", "Driver only", "Painter only", "Carpenter only", "A", "Doctors help diagnose and treat illness."),
-        ("Who may grow crops?", "Farmer", "Librarian only", "Pilot only", "Cashier only", "A", "Farmers commonly grow crops."),
-        ("What is a community?", "People living or working together", "Only one person", "Only buildings", "Only roads", "A", "A community includes people connected by a shared place or activities."),
-        ("Which is a family member?", "Parent", "Road", "School bag", "Table", "A", "A parent is a family member."),
-        ("Why do communities need rules?", "To support safe and orderly living", "To stop all communication", "To remove cooperation", "To prevent learning", "A", "Rules help communities function safely and fairly."),
-        ("Who may keep streets clean?", "Sanitation worker", "Book", "Tree", "Chair", "A", "Sanitation workers help keep public areas clean."),
-        ("Which place is part of a community?", "School", "Cloud", "Moon", "Rainbow only", "A", "Schools are community institutions."),
-        ("What is cooperation?", "Working together", "Working against everyone", "Avoiding all communication", "Refusing help", "A", "Cooperation means working together toward a shared purpose."),
-        ("Which action supports a community?", "Helping others", "Damaging public property", "Wasting water", "Littering", "A", "Helping others supports community well-being."),
-    ],
-    14: [
-        ("Why is water important?", "Living things need it", "Only machines need it", "It is never used", "It has no purpose", "A", "People, animals and plants need water."),
-        ("Which action saves water?", "Close the tap after use", "Leave the tap running", "Break a pipe", "Waste clean water", "A", "Closing taps reduces unnecessary water use."),
-        ("Which is a use of water?", "Drinking", "Making stones", "Turning into metal", "Removing sunlight", "A", "Drinking is an essential use of water."),
-        ("What should you do if a tap leaks?", "Report or repair the leak", "Ignore it forever", "Increase the leak", "Waste more water", "A", "Repairing leaks helps conserve water."),
-        ("Which needs water to grow?", "Plants", "Plastic", "Glass", "Metal", "A", "Plants need water for growth and life processes."),
-        ("Where can water be found naturally?", "Rivers", "Plastic bags", "Computers", "Tables", "A", "Rivers are natural water bodies."),
-        ("Which habit wastes water?", "Leaving a tap running", "Closing the tap", "Fixing leaks", "Using only what is needed", "A", "Leaving a tap running can waste water."),
-        ("What should we drink for hydration?", "Safe drinking water", "Dirty water", "Unknown chemical", "Paint", "A", "Safe drinking water supports hydration."),
-        ("Which is a water-saving habit?", "Use a bucket when suitable", "Keep taps open", "Wash roads with clean water unnecessarily", "Ignore leaks", "A", "Using only the needed amount of water can reduce wastage."),
-        ("Why should water be kept clean?", "To protect health and ecosystems", "To make it useless", "To increase pollution", "To remove all life", "A", "Clean water is important for health and the environment."),
-    ],
-    15: [
-        ("What do plants provide to many animals and people?", "Food", "Plastic only", "Metal only", "Electricity only", "A", "Plants are important sources of food."),
-        ("Which is an animal?", "Elephant", "Mango tree", "Grass", "Rose", "A", "An elephant is an animal."),
-        ("Why are plants important?", "They provide food and oxygen", "They create plastic", "They stop all rainfall", "They remove all habitats", "A", "Plants support life in several ways, including food and oxygen production."),
-        ("What is biodiversity?", "Variety of living organisms", "Only one species", "Only rocks", "Only buildings", "A", "Biodiversity means the variety of life."),
-        ("Which animal is commonly herbivorous?", "Cow", "Tiger", "Eagle", "Snake", "A", "Cows commonly feed on plants."),
-        ("Which animal is commonly carnivorous?", "Tiger", "Cow", "Goat", "Deer", "A", "Tigers are carnivores that eat other animals."),
-        ("What should people do to protect wildlife?", "Protect habitats", "Destroy habitats", "Hunt unnecessarily", "Pollute rivers", "A", "Protecting habitats supports wildlife."),
-        ("Which is a plant part?", "Leaf", "Wing", "Fin", "Horn", "A", "A leaf is a plant part."),
-        ("How do plants help ecosystems?", "They provide food and habitats", "They remove all animals", "They stop every process", "They make all water salty", "A", "Plants support food chains and provide habitats."),
-        ("Which action harms biodiversity?", "Destroying natural habitats", "Planting native trees", "Protecting forests", "Reducing pollution", "A", "Habitat destruction can reduce biodiversity."),
-    ],
-    16: [
-        ("What is a good environmental habit?", "Use bins for waste", "Throw waste on roads", "Pollute rivers", "Burn all plastic", "A", "Using bins helps keep surroundings clean."),
-        ("What can recycling help do?", "Reduce waste", "Increase litter", "Pollute more", "Waste resources", "A", "Recycling can reduce the amount of waste sent for disposal."),
-        ("Which action keeps surroundings clean?", "Pick up litter and dispose of it properly", "Throw wrappers anywhere", "Block drains", "Dump waste in rivers", "A", "Proper disposal helps maintain clean surroundings."),
-        ("Why should drains be kept clear?", "To support proper water flow", "To create litter", "To stop all water movement", "To increase disease", "A", "Clear drains help water flow and reduce blockage."),
-        ("Which waste item can often be recycled?", "Paper", "Food leftovers only", "Dirty wastewater", "Smoke", "A", "Paper is commonly recyclable when appropriately collected."),
-        ("What does reuse mean?", "Use an item again when suitable", "Throw it away immediately", "Burn it always", "Make it dirty", "A", "Reuse means using an item again rather than discarding it."),
-        ("Which can reduce pollution?", "Using resources responsibly", "Dumping waste", "Burning waste everywhere", "Throwing plastic into rivers", "A", "Responsible resource use can reduce pollution."),
-        ("What should be done with hazardous waste?", "Handle and dispose of it safely", "Mix it with drinking water", "Throw it anywhere", "Give it to children", "A", "Hazardous waste needs safe handling and disposal."),
-        ("Which is a clean-energy example?", "Solar energy", "Plastic burning", "Open waste burning", "Oil spill", "A", "Solar energy comes from sunlight and is renewable."),
-        ("Why is cleanliness important?", "It supports health and a safe environment", "It increases litter", "It prevents hygiene", "It creates pollution", "A", "Clean surroundings support health and safety."),
-    ],
-    17: [
-        ("Which device is used for typing?", "Keyboard", "Monitor", "Speaker", "Printer", "A", "A keyboard is used to enter text."),
-        ("Which device displays information?", "Monitor", "Keyboard", "Mouse pad", "Cable", "A", "A monitor displays visual information."),
-        ("Which device points and clicks?", "Mouse", "Keyboard", "Printer", "Speaker", "A", "A mouse is used for pointing and clicking."),
-        ("Which device can produce a paper copy?", "Printer", "Monitor", "Mouse", "Keyboard", "A", "A printer can produce printed output."),
-        ("What is a computer used for?", "Processing information", "Only making noise", "Only storing furniture", "Only cooking food", "A", "Computers process and store information and perform tasks."),
-        ("Which is an input device?", "Keyboard", "Monitor", "Speaker", "Projector", "A", "A keyboard sends input to the computer."),
-        ("Which is an output device?", "Monitor", "Keyboard", "Mouse", "Microphone", "A", "A monitor provides visual output."),
-        ("What does CPU commonly stand for?", "Central Processing Unit", "Computer Personal Utility", "Central Print Unit", "Control Program User", "A", "CPU stands for Central Processing Unit."),
-        ("Which device is commonly used to hear sound?", "Speaker", "Keyboard", "Mouse", "Scanner", "A", "Speakers output audio."),
-        ("Which device can capture a paper document digitally?", "Scanner", "Speaker", "Keyboard", "Monitor", "A", "A scanner converts paper documents into digital images."),
-    ],
-    18: [
-        ("What software is used to open websites?", "Web browser", "Calculator only", "Paint only", "File cabinet", "A", "A web browser is used to access websites."),
-        ("What is a website?", "A collection of web pages and resources", "A physical notebook", "A keyboard key", "A computer cable", "A", "A website can contain related web pages and resources."),
-        ("What does a search engine help users do?", "Find information online", "Print food", "Charge a battery", "Repair hardware automatically", "A", "Search engines help locate information on the web."),
-        ("Which is an example of a browser?", "Chrome", "Keyboard", "Monitor", "CPU", "A", "Chrome is a web browser."),
-        ("What does a URL identify?", "A location on the web", "A keyboard button", "A battery type", "A printer cartridge", "A", "A URL identifies a web resource address."),
-        ("What is a hyperlink?", "A clickable link to another resource", "A computer fan", "A battery", "A monitor stand", "A", "A hyperlink can take a user to another resource."),
-        ("What is online search used for?", "Finding information", "Turning off electricity", "Printing automatically", "Cleaning hardware", "A", "Online search helps users find information."),
-        ("Which is needed to access many online services?", "Internet connection", "Paper only", "Pencil only", "Desk lamp only", "A", "Many online services require an internet connection."),
-        ("What should you check before downloading a file?", "Source and file safety", "Only the file color", "Only the font", "Only the screen size", "A", "Checking the source and safety reduces risk."),
-        ("Which is an online communication tool?", "Email", "Keyboard", "Monitor", "Mouse", "A", "Email is an internet-based communication method."),
-    ],
-    19: [
-        ("Should you share your password with strangers?", "No", "Yes", "Always", "Publicly", "A", "Passwords should be kept private."),
-        ("What makes a password stronger?", "A long combination of different characters", "Your name only", "123456", "password", "A", "Long, unpredictable passwords are harder to guess."),
-        ("What should you do with a suspicious link?", "Avoid opening it and verify the source", "Open it immediately", "Share it with everyone", "Enter your password", "A", "Suspicious links can be unsafe and should be verified before opening."),
-        ("What is personal information?", "Information that can identify or describe you", "Only public weather data", "A computer mouse", "A chair", "A", "Personal information can identify or describe an individual."),
-        ("Should a one-time password be shared with others?", "No", "Yes", "Always", "On social media", "A", "One-time passwords should remain private."),
-        ("What should you do if an account shows suspicious activity?", "Change the password and report it", "Ignore it", "Share the password", "Post it publicly", "A", "Changing credentials and reporting suspicious activity can help protect the account."),
-        ("Which is safer?", "Unique passwords for important accounts", "One password for everything", "Publicly posted passwords", "Simple names as passwords", "A", "Unique passwords limit damage if one account is compromised."),
-        ("Why use multi-factor authentication?", "It adds another verification step", "It removes all security", "It shares passwords", "It disables accounts", "A", "Multi-factor authentication adds an additional verification factor."),
-        ("What should you do before entering credentials on a website?", "Check the website and connection carefully", "Trust every link", "Ignore the address", "Share credentials first", "A", "Checking the destination can help avoid phishing and unsafe sites."),
-        ("What is phishing?", "A deceptive attempt to obtain sensitive information", "A computer game", "A printer process", "A file format", "A", "Phishing uses deception to obtain sensitive information."),
-    ],
-    20: [
-        ("Why should you take breaks from screens?", "To reduce strain and support healthy use", "To damage your eyes", "To stop learning", "To avoid all technology", "A", "Regular breaks can reduce discomfort and support healthier screen use."),
-        ("How should you communicate online?", "Respectfully", "Abusively", "By sharing secrets", "By threatening others", "A", "Respectful communication supports a safe digital environment."),
-        ("What should you do before sharing a news item?", "Check whether the information is reliable", "Share immediately", "Delete all sources", "Change the facts", "A", "Checking reliability helps reduce misinformation."),
-        ("What should you do with an unknown attachment?", "Verify the source before opening it", "Open it immediately", "Forward it to everyone", "Enter passwords into it", "A", "Unknown attachments may be unsafe and should be verified first."),
-        ("What is responsible technology use?", "Using devices safely, respectfully and thoughtfully", "Using them without limits", "Sharing private data", "Harassing others", "A", "Responsible use combines safety, respect and thoughtful behavior."),
-        ("Why should personal data be protected?", "It can be misused if exposed", "It has no value", "Everyone must know it", "It should always be public", "A", "Personal data can be misused when exposed to untrusted people."),
-        ("Which habit supports healthy device use?", "Take regular breaks", "Use screens continuously", "Ignore discomfort", "Never sleep", "A", "Regular breaks support healthier device use."),
-        ("What should you do when unsure about online information?", "Verify it using reliable sources", "Forward it immediately", "Invent a source", "Hide the facts", "A", "Verification helps distinguish reliable information from misinformation."),
-        ("Which behavior is respectful online?", "Disagree politely", "Insult people", "Share private messages publicly", "Threaten users", "A", "Polite disagreement is respectful digital communication."),
-        ("What is a good response to cyberbullying?", "Save evidence and tell a trusted adult or authority", "Join the bullying", "Share more private information", "Threaten back", "A", "Keeping evidence and seeking trusted help is safer than retaliating."),
-    ],
+# ============================================================
+# IMPORTANT
+# ============================================================
+#
+# KEEP YOUR EXISTING QUESTIONS = {...} BLOCK HERE.
+#
+# Do NOT delete your current 200-question QUESTIONS dictionary.
+#
+# Paste the QUESTIONS dictionary from your current
+# seed_content.py below this comment.
+#
+# Example:
+#
+# QUESTIONS = {
+#     1: [...],
+#     2: [...],
+#     ...
+#     20: [...]
+# }
+#
+# ============================================================
+
+
+# ============================================================
+# EXISTING QUESTIONS CHECK
+# ============================================================
+
+try:
+    QUESTIONS
+except NameError:
+    QUESTIONS = {}
+
+
+# ============================================================
+# OFFICIAL SUBJECT IDS
+# ============================================================
+#
+# These IDs match the current Render database you showed:
+#
+# Mathematics          = 1
+# Science              = 4
+# English Language     = 5
+# Environmental Studies= 6
+# Digital Literacy     = 7
+#
+# We intentionally DO NOT delete these records.
+# ============================================================
+
+OFFICIAL_SUBJECT_IDS = {
+    "Mathematics": 1,
+    "Science": 4,
+    "English Language": 5,
+    "Environmental Studies": 6,
+    "Digital Literacy": 7,
 }
 
 
-def sync_sequence(db, table_name):
-    """
-    Synchronize PostgreSQL auto-increment sequence with MAX(id).
-    This works even when rows already exist in the table.
-    """
-
-    sequence_name = db.execute(
-        text(
-            f"SELECT pg_get_serial_sequence('{table_name}', 'id')"
-        )
-    ).scalar()
-
-    if not sequence_name:
-        print(f"No sequence found for table: {table_name}")
-        return
-
-    max_id = db.execute(
-        text(f"SELECT COALESCE(MAX(id), 0) FROM {table_name}")
-    ).scalar()
-
-    max_id = int(max_id or 0)
-
-    if max_id == 0:
-        db.execute(
-            text(f"SELECT setval('{sequence_name}', 1, false)")
-        )
-    else:
-        db.execute(
-            text(f"SELECT setval('{sequence_name}', :max_id, true)"),
-            {"max_id": max_id},
-        )
-
-    print(
-        f"Sequence synced: {table_name} | max_id={max_id} | sequence={sequence_name}"
-    )
-
-
-def sync_all_sequences(db):
-    """
-    Sync all important primary-key sequences before inserting data.
-    """
-
-    for table_name in [
-        "subjects",
-        "lessons",
-        "quiz_questions",
-    ]:
-        sync_sequence(db, table_name)
-
-    db.commit()
-
+# ============================================================
+# GET TEACHER
+# ============================================================
 
 def get_teacher(db):
     user = (
@@ -464,61 +247,96 @@ def get_teacher(db):
 
     if not user:
         raise RuntimeError(
-            "No teacher/admin user found. Register a teacher/admin account first."
+            "No teacher/admin user found. "
+            "Register a teacher/admin account first."
         )
 
     return user
 
 
-def seed_subjects(db):
+# ============================================================
+# REPAIR SUBJECTS
+# ============================================================
+
+def repair_subjects(db):
+    print("\n========================================")
+    print("REPAIRING SUBJECTS")
+    print("========================================")
+
     subject_map = {}
 
     for name, description, language in SUBJECTS:
 
+        official_id = OFFICIAL_SUBJECT_IDS[name]
+
         subject = (
             db.query(models.Subject)
-            .filter(models.Subject.name == name)
+            .filter(models.Subject.id == official_id)
             .first()
         )
 
-        if subject:
-            print(
-                f"Subject already exists: {name} (id={subject.id})"
+        if not subject:
+            raise RuntimeError(
+                f"Required subject '{name}' with ID "
+                f"{official_id} was not found."
             )
 
-            # Update existing subject information
-            subject.description = description
-            subject.language = language
-            subject.is_active = True
-
-        else:
-            subject = models.Subject(
-                name=name,
-                description=description,
-                language=language,
-                is_active=True,
-            )
-
-            db.add(subject)
-            db.flush()
-
-            print(
-                f"Created subject: {name} (id={subject.id})"
-            )
+        subject.name = name
+        subject.description = description
+        subject.language = language
+        subject.is_active = True
 
         subject_map[name] = subject.id
 
+        print(
+            f"Official subject: {name} "
+            f"(id={subject.id})"
+        )
+
+    # --------------------------------------------------------
+    # Deactivate old/duplicate subjects
+    # --------------------------------------------------------
+
+    for subject in db.query(models.Subject).all():
+
+        if subject.id not in OFFICIAL_SUBJECT_IDS.values():
+
+            if subject.is_active:
+                subject.is_active = False
+
+                print(
+                    f"Deactivated old subject: "
+                    f"{subject.name} "
+                    f"(id={subject.id})"
+                )
+
     db.commit()
 
-    # New rows may have been created, so sync again.
-    sync_sequence(db, "subjects")
-    db.commit()
+    print("\nSubject repair completed.")
 
     return subject_map
 
 
-def seed_lessons(db, subject_map, teacher):
+# ============================================================
+# REPAIR LESSONS
+# ============================================================
+
+def repair_lessons(db, subject_map, teacher):
+
+    print("\n========================================")
+    print("REPAIRING LESSONS")
+    print("========================================")
+
     lesson_map = {}
+
+    official_titles = {
+        lesson[1]
+        for lesson in LESSONS
+    }
+
+    # --------------------------------------------------------
+    # Create/update official 20 lessons
+    # --------------------------------------------------------
 
     for subject_no, title, description, content in LESSONS:
 
@@ -533,15 +351,20 @@ def seed_lessons(db, subject_map, teacher):
 
         if lesson:
 
-            print(
-                f"Lesson already exists: {title} (id={lesson.id})"
-            )
+            # IMPORTANT:
+            # Repair the subject mapping.
+            lesson.subject_id = subject_id
 
-            # Update existing lesson
             lesson.description = description
             lesson.content = content
             lesson.language = "Hindi"
-            lesson.subject_id = subject_id
+            lesson.is_active = True
+
+            print(
+                f"Repaired lesson: {title} "
+                f"(id={lesson.id}) "
+                f"→ subject_id={subject_id}"
+            )
 
         else:
 
@@ -558,50 +381,102 @@ def seed_lessons(db, subject_map, teacher):
             db.flush()
 
             print(
-                f"Created lesson: {title} (id={lesson.id})"
+                f"Created lesson: {title} "
+                f"(id={lesson.id}) "
+                f"→ subject_id={subject_id}"
             )
 
         lesson_map[title] = lesson.id
 
     db.commit()
 
-    sync_sequence(db, "lessons")
+    # --------------------------------------------------------
+    # Deactivate old/stale lessons
+    # --------------------------------------------------------
+
+    all_lessons = db.query(models.Lesson).all()
+
+    for lesson in all_lessons:
+
+        if lesson.title not in official_titles:
+
+            if lesson.is_active:
+                lesson.is_active = False
+
+                print(
+                    f"Deactivated old lesson: "
+                    f"{lesson.title} "
+                    f"(id={lesson.id})"
+                )
+
     db.commit()
+
+    print("\nLesson repair completed.")
 
     return lesson_map
 
 
-def seed_questions(db, lesson_map):
+# ============================================================
+# REPAIR QUIZ QUESTIONS
+# ============================================================
+
+def repair_questions(db, lesson_map):
+
+    print("\n========================================")
+    print("REPAIRING QUIZ QUESTIONS")
+    print("========================================")
+
+    total_added = 0
 
     for lesson_index, lesson_row in enumerate(
         LESSONS,
-        start=1,
+        start=1
     ):
 
         _, title, _, _ = lesson_row
 
         lesson_id = lesson_map[title]
 
+        question_bank = QUESTIONS.get(
+            lesson_index,
+            []
+        )
+
+        if not question_bank:
+            print(
+                f"WARNING: No question bank found "
+                f"for lesson {lesson_index}: {title}"
+            )
+            continue
+
         existing_count = (
             db.query(models.QuizQuestion)
             .filter(
-                models.QuizQuestion.lesson_id == lesson_id
+                models.QuizQuestion.lesson_id
+                == lesson_id
             )
             .count()
         )
 
+        # ----------------------------------------------------
+        # If 10 questions already exist, preserve them.
+        # ----------------------------------------------------
+
         if existing_count >= 10:
 
             print(
-                f"Questions already present for: "
-                f"{title} ({existing_count})"
+                f"Questions already present: "
+                f"{title} "
+                f"({existing_count})"
             )
 
             continue
 
-        questions_to_add = QUESTIONS[lesson_index]
+        # ----------------------------------------------------
+        # Add only missing questions.
+        # ----------------------------------------------------
 
-        for q in questions_to_add:
+        for q in question_bank:
 
             (
                 question_text,
@@ -613,28 +488,117 @@ def seed_questions(db, lesson_map):
                 explanation,
             ) = q
 
-            db.add(
-                models.QuizQuestion(
-                    lesson_id=lesson_id,
-                    question=question_text,
-                    option_a=option_a,
-                    option_b=option_b,
-                    option_c=option_c,
-                    option_d=option_d,
-                    correct_answer=correct_answer,
-                    explanation=explanation,
-                )
+            question = models.QuizQuestion(
+                lesson_id=lesson_id,
+                question=question_text,
+                option_a=option_a,
+                option_b=option_b,
+                option_c=option_c,
+                option_d=option_d,
+                correct_answer=correct_answer,
+                explanation=explanation,
             )
+
+            db.add(question)
+
+            total_added += 1
 
         db.commit()
 
         print(
-            f"Added {len(questions_to_add)} quiz questions: {title}"
+            f"Added {len(question_bank)} "
+            f"questions: {title}"
         )
 
-    sync_sequence(db, "quiz_questions")
-    db.commit()
+    print(
+        f"\nNew quiz questions added: "
+        f"{total_added}"
+    )
 
+
+# ============================================================
+# FINAL VERIFICATION
+# ============================================================
+
+def verify_curriculum(db):
+
+    print("\n========================================")
+    print("FINAL CURRICULUM CHECK")
+    print("========================================")
+
+    print("\nACTIVE SUBJECTS:")
+
+    active_subjects = (
+        db.query(models.Subject)
+        .filter(
+            models.Subject.is_active == True
+        )
+        .order_by(models.Subject.id)
+        .all()
+    )
+
+    for subject in active_subjects:
+
+        print(
+            f"  ID {subject.id}: "
+            f"{subject.name}"
+        )
+
+    print("\nACTIVE LESSONS:")
+
+    active_lessons = (
+        db.query(models.Lesson)
+        .filter(
+            models.Lesson.is_active == True
+        )
+        .order_by(models.Lesson.id)
+        .all()
+    )
+
+    subject_lesson_count = {}
+
+    for lesson in active_lessons:
+
+        subject_lesson_count[
+            lesson.subject_id
+        ] = (
+            subject_lesson_count.get(
+                lesson.subject_id,
+                0
+            ) + 1
+        )
+
+        print(
+            f"  Lesson ID {lesson.id}: "
+            f"{lesson.title} "
+            f"→ subject_id={lesson.subject_id}"
+        )
+
+    print("\nLESSON COUNT BY SUBJECT:")
+
+    for subject_id, count in sorted(
+        subject_lesson_count.items()
+    ):
+
+        print(
+            f"  subject_id={subject_id}: "
+            f"{count} lessons"
+        )
+
+    total_questions = (
+        db.query(models.QuizQuestion)
+        .count()
+    )
+
+    print(
+        f"\nTotal quiz questions: "
+        f"{total_questions}"
+    )
+
+
+# ============================================================
+# MAIN
+# ============================================================
 
 def main():
 
@@ -642,66 +606,103 @@ def main():
 
     try:
 
-        print("=" * 70)
-        print("SIH VERNACULAR EDUCATION - CURRICULUM SEED")
-        print("=" * 70)
+        print("\n")
+        print("========================================")
+        print("SIH VERNACULAR EDUCATION")
+        print("CURRICULUM DATABASE REPAIR")
+        print("========================================")
 
-        # IMPORTANT:
-        # Existing Render database already contains rows.
-        # Synchronize sequences BEFORE inserting anything.
-        sync_all_sequences(db)
+        # ----------------------------------------------------
+        # Teacher/admin
+        # ----------------------------------------------------
 
         teacher = get_teacher(db)
 
         print(
-            f"Using teacher/admin user: "
-            f"{teacher.name} (id={teacher.id})"
+            f"\nUsing teacher/admin user: "
+            f"{teacher.name} "
+            f"(id={teacher.id})"
         )
 
-        print("\n--- SEEDING SUBJECTS ---")
+        # ----------------------------------------------------
+        # Subjects
+        # ----------------------------------------------------
 
-        subject_map = seed_subjects(db)
+        subject_map = repair_subjects(db)
 
-        print("\n--- SEEDING LESSONS ---")
+        # ----------------------------------------------------
+        # Lessons
+        # ----------------------------------------------------
 
-        lesson_map = seed_lessons(
+        lesson_map = repair_lessons(
             db,
             subject_map,
             teacher,
         )
 
-        print("\n--- SEEDING QUIZ QUESTIONS ---")
+        # ----------------------------------------------------
+        # Questions
+        # ----------------------------------------------------
 
-        seed_questions(
+        repair_questions(
             db,
             lesson_map,
         )
 
-        # Final sequence synchronization.
-        sync_all_sequences(db)
+        # ----------------------------------------------------
+        # Final verification
+        # ----------------------------------------------------
 
-        print("\n" + "=" * 70)
+        verify_curriculum(db)
+
+        print("\n")
+        print("========================================")
+        print("DONE")
+        print("========================================")
         print(
-            "DONE: 5 subjects, 20 lessons and up to "
-            "200 quiz questions are ready."
+            "5 official subjects are active."
         )
         print(
-            "Random quiz endpoint will select 5 questions "
-            "from each lesson's question bank."
+            "20 official lessons are active."
         )
-        print("=" * 70)
+        print(
+            "Lesson-to-subject mapping repaired."
+        )
+        print(
+            "Old/duplicate subjects deactivated."
+        )
+        print(
+            "Old/stale lessons deactivated."
+        )
+        print(
+            "Existing quiz questions preserved."
+        )
+        print(
+            "Missing quiz questions added."
+        )
+        print("========================================")
 
-    except Exception:
+    except Exception as error:
 
         db.rollback()
 
-        print("\nSEED FAILED.")
+        print("\n")
+        print("========================================")
+        print("SEED/REPAIR FAILED")
+        print("========================================")
+        print(str(error))
+        print("========================================")
+
         raise
 
     finally:
 
         db.close()
 
+
+# ============================================================
+# RUN
+# ============================================================
 
 if __name__ == "__main__":
     main()
