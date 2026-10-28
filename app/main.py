@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from uuid import uuid4
 from io import BytesIO
+from app.ai_tutor import router as ai_tutor_router
 import random
 
 from app import schemas
@@ -55,10 +56,12 @@ Base.metadata.create_all(bind=engine)
 # ============================================================
 
 app = FastAPI(
+    
     title="AI-Powered Vernacular Education API",
     description="Backend for SIH26042",
     version="1.0.0"
 )
+app.include_router(ai_tutor_router)
 
 
 # ============================================================
